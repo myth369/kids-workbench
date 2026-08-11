@@ -24,24 +24,25 @@
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
             font-family: var(--font);
-            background: #E8EAED;
+            background: #FDE8E0;
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            -webkit-tap-highlight-color: transparent;
+            min-height: 100vh;
         }
+
         .app-container {
-            width: 100%;
-            max-width: 440px;
+            width: 100%;               /* 移动端全宽 */
+            max-width: 100%;           /* 不超出屏幕 */
             height: 100vh;
-            max-height: 900px;
             background: var(--bg);
             display: flex;
             border-radius: 0;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+            box-shadow: none;
+            margin: 0;
         }
         @media (max-width:440px) {
             .app-container { max-height:100vh; border-radius:0; }
@@ -64,11 +65,15 @@
                 --page-padding: 16px;
             }
             .app-container {
-                max-width: 500px;          /* 稍宽一点，但保持卡片感 */
+                width: 100%;
+                /* max-width: 520px; */
+                height: 100vh;
                 border-radius: 16px;
-                margin: 20px auto;
-                height: 95vh;
-                max-height: 900px;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+                /* margin: 20px auto; */
+            }
+            body {
+                background: linear-gradient(135deg, #FDE8E0, #E8F0FE);
             }
             .nav-item {
                 width: 64px;
@@ -83,11 +88,9 @@
         /* ========== 电脑大屏（宽度 ≥ 1024px） ========== */
         @media (min-width: 1024px) {
             .app-container {
-                max-width: 520px;
-                margin: 30px auto;
-                height: 90vh;
-                max-height: 860px;
-                box-shadow: 0 25px 80px rgba(0,0,0,0.15);
+                /* width: 60%; */
+                /* max-width: 560px; */
+                /* height: 85vh; */
             }
             body {
                 background: linear-gradient(135deg, #FDE8E0 0%, #E8F0FE 100%);
