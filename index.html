@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <script src="https://unpkg.com/pinyin-pro@3.19.5/dist/index.js"></script>
     <title>幼小衔接 · 成长工作台</title>
     <style>
         :root {
@@ -477,15 +478,59 @@ function renderChinese() {
     let poem = CONTENT.poems[di % CONTENT.poems.length];
     let idiom = CONTENT.idiomStories[di % CONTENT.idiomStories.length];
     let words = CONTENT.wordGroups[di % CONTENT.wordGroups.length];
+    let body = document.getElementById('pageBody');
+    
+    // 使用 pinyinPro 将诗句转为拼音（带声调）
+    let poemPinyin = '';
+    try {
+        if (typeof pinyinPro !== 'undefined') {
+            poemPinyin = pinyinPro.pinyin(poem.content, { toneType: 'symbol', type: 'array' });
+        }
+    } catch(e) {}
+    
+    // 构造诗句带拼音的HTML
+    let poemLines = poem.content.split('\n');
+    let poemHtml = '';
+    if (poemPinyin && poemPinyin.length > 0) {
+        // 将拼音数组按行分割重组
+        let pinyinIdx = 0;
+        poemLines.forEach(line => {
+            poemHtml += '<div style="margin-bottom:4px;">';
+            for (let char of line) {
+                if (char.match(/[\u4e00-\u9fa5]/)) {
+                    poemHtml += `<span style="display:inline-flex;flex-direction:column;align-items:center;margin:0 2px;"><span style="font-size:10px;color:#888;">${poemPinyin[pinyinIdx] || ''}</span><span>${char}</span></span>`;
+                    pinyinIdx++;
+                } else {
+                    poemHtml += `<span>${char}</span>`;
+                }
+            }
+            poemHtml += '</div>';
+        });
+    } else {
+        poemHtml = `<div style="white-space:pre-line;">${poem.content}</div>`;
+    }
+    
+    // 生字拼音
+    let wordsHtml = '';
+    words.forEach(w => {
+        let py = '';
+        try { if(typeof pinyinPro!=='undefined') py = pinyinPro.pinyin(w, {toneType:'symbol'}); } catch(e){}
+        wordsHtml += `<div class="char-card"><span class="pinyin" style="font-size:10px;color:#666;">${py||''}</span><span>${w}</span></div>`;
+    });
+    
     body.innerHTML = `
-    <div class="card"><div class="card-header">📜 ${poem.title} - ${poem.author}</div>
-        <p style="white-space:pre-line;">${poem.content}</p>
+    <div class="card">
+        <div class="card-header">📜 ${poem.title} - ${poem.author}</div>
+        ${poemHtml}
         <p style="color:#646A73;font-size:13px;">${poem.explain}</p>
         <button class="btn btn-primary btn-sm" onclick="check('poem')">✅ 已背诵</button>
     </div>
-    <div class="card"><div class="card-header">📚 ${idiom.idiom}</div><p>${idiom.story}</p></div>
-    <div class="card"><div class="card-header">✏️ 今日新字</div>
-        <div class="flex-wrap">${words.map(w=>`<div class="char-card"><span>${w}</span></div>`).join('')}</div>
+    <div class="card">
+        <div class="card-header">📚 ${idiom.idiom}</div><p>${idiom.story}</p>
+    </div>
+    <div class="card">
+        <div class="card-header">✏️ 今日新字</div>
+        <div class="flex-wrap">${wordsHtml}</div>
         <button class="btn btn-success btn-sm" style="margin-top:8px;" onclick="check('words')">✅ 已学习</button>
     </div>`;
 }
