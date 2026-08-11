@@ -47,6 +47,74 @@
             .app-container { max-height:100vh; border-radius:0; }
         }
 
+        /* ========== 基础变量（手机优先） ========== */
+        :root {
+            --nav-width: 68px;
+            --font-size-base: 14px;
+            --card-padding: 14px;
+            --page-padding: 10px;
+        }
+
+        /* ========== 平板及以上（宽度 ≥ 600px） ========== */
+        @media (min-width: 600px) {
+            :root {
+                --nav-width: 80px;
+                --font-size-base: 15px;
+                --card-padding: 18px;
+                --page-padding: 16px;
+            }
+            .app-container {
+                max-width: 500px;          /* 稍宽一点，但保持卡片感 */
+                border-radius: 16px;
+                margin: 20px auto;
+                height: 95vh;
+                max-height: 900px;
+            }
+            .nav-item {
+                width: 64px;
+                height: 64px;
+            }
+            .nav-item .nav-icon { font-size: 24px; }
+            .nav-item .nav-label { font-size: 11px; }
+            .page-title { font-size: 20px; }
+            .game-card { width: 80px; height: 90px; font-size: 18px; }
+        }
+
+        /* ========== 电脑大屏（宽度 ≥ 1024px） ========== */
+        @media (min-width: 1024px) {
+            .app-container {
+                max-width: 520px;
+                margin: 30px auto;
+                height: 90vh;
+                max-height: 860px;
+                box-shadow: 0 25px 80px rgba(0,0,0,0.15);
+            }
+            body {
+                background: linear-gradient(135deg, #FDE8E0 0%, #E8F0FE 100%);
+            }
+            .side-nav {
+                padding-top: 24px;
+            }
+            .nav-logo {
+                width: 46px;
+                height: 46px;
+                font-size: 22px;
+            }
+            .points-display {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+            /* 让拼音在电脑上更清晰 */
+            ruby rt {
+                font-size: 0.65em;
+            }
+            .char-card {
+                min-width: 60px;
+                font-size: 22px;
+                padding: 10px 8px;
+            }
+        }
+
         /* ---- 左侧导航 ---- */
         .side-nav {
             width: var(--nav-width);
