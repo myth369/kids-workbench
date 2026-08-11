@@ -488,27 +488,23 @@ function renderChinese() {
         }
     } catch(e) {}
     
-    // 构造诗句带拼音的HTML
+    // 生成带注音的诗句（使用 <ruby>）
     let poemLines = poem.content.split('\n');
-    let poemHtml = '';
-    if (poemPinyin && poemPinyin.length > 0) {
-        // 将拼音数组按行分割重组
-        let pinyinIdx = 0;
-        poemLines.forEach(line => {
-            poemHtml += '<div style="margin-bottom:4px;">';
-            for (let char of line) {
-                if (char.match(/[\u4e00-\u9fa5]/)) {
-                    poemHtml += `<span style="display:inline-flex;flex-direction:column;align-items:center;margin:0 2px;"><span style="font-size:10px;color:#888;">${poemPinyin[pinyinIdx] || ''}</span><span>${char}</span></span>`;
-                    pinyinIdx++;
-                } else {
-                    poemHtml += `<span>${char}</span>`;
-                }
+    let poemHtml = poemLines.map(line => {
+        let lineHtml = '';
+        for (let char of line) {
+            if (/[\u4e00-\u9fa5]/.test(char)) {
+                // 单个汉字用 pinyinPro 取拼音
+                let py = '';
+                try { if (typeof pinyinPro !== 'undefined') py = pinyinPro.pinyin(char, { toneType: 'symbol' }); } catch(e) {}
+                lineHtml += `<ruby style="ruby-align:center;">${char}<rt>${py || ''}</rt></ruby>`;
+            } else {
+                // 标点、数字等直接显示
+                lineHtml += `<span>${char}</span>`;
             }
-            poemHtml += '</div>';
-        });
-    } else {
-        poemHtml = `<div style="white-space:pre-line;">${poem.content}</div>`;
-    }
+        }
+        return `<div style="line-height:2.2;">${lineHtml}</div>`;
+    }).join('');
     
     // 生字拼音
     let wordsHtml = '';
