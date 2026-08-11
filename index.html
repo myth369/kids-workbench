@@ -5,323 +5,627 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <title>🌟 幼小衔接快乐工作台</title>
+    <title>幼小衔接 · 成长工作台</title>
     <style>
         :root {
-            --bg: #FFF8F0;
-            --nav-bg: #FFE4D6;
+            --feishu-blue: #3370FF;
+            --feishu-blue-light: #E1EAFF;
+            --bg: #F5F6FA;
             --card: #FFFFFF;
-            --pink: #FF6B8A;
-            --blue: #5B9BD5;
-            --green: #6BCB77;
-            --orange: #FFA94D;
-            --purple: #B197FC;
-            --yellow: #FFD43B;
-            --text: #4A3728;
-            --light-text: #8B7355;
-            --shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-            --radius: 18px;
-            --nav-width: 68px;
+            --text: #1F2329;
+            --text-secondary: #646A73;
+            --border: #E5E6EB;
+            --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+            --radius: 12px;
+            --nav-width: 72px;
+            --font: 'PingFang SC','Microsoft YaHei',sans-serif;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
-        html,body { height:100%; width:100%; font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif; background:#FDE8E0; display:flex; justify-content:center; align-items:center; -webkit-tap-highlight-color:transparent; user-select:none; overflow:hidden; }
-        .app-container { width:100%; max-width:440px; height:100vh; max-height:900px; background:var(--bg); display:flex; border-radius:8px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.18); position:relative; }
-        @media (max-width:440px) { .app-container { border-radius:0; max-height:100vh; } body { align-items:stretch; } }
-        .side-nav { width:var(--nav-width); min-width:var(--nav-width); background:var(--nav-bg); display:flex; flex-direction:column; align-items:center; padding:12px 4px; gap:4px; z-index:10; border-right:2px solid #FFD4C0; overflow-y:auto; }
-        .side-nav::-webkit-scrollbar { display:none; }
-        .nav-logo { font-size:28px; margin-bottom:6px; animation:bounce 2s infinite; }
-        @keyframes bounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
-        .nav-item { width:54px; height:54px; border-radius:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; background:transparent; border:2px solid transparent; gap:2px; }
-        .nav-item .nav-icon { font-size:22px; }
-        .nav-item .nav-label { font-size:9px; color:var(--text); font-weight:600; white-space:nowrap; }
-        .nav-item:hover { background:#FFD0BC; transform:scale(1.04); }
-        .nav-item:active { transform:scale(0.94); background:#FFC4AB; }
-        .nav-item.active { background:#FFFFFF; border-color:#FF9E80; box-shadow:0 3px 12px rgba(255,107,138,0.25); }
-        .main-content { flex:1; display:flex; flex-direction:column; overflow:hidden; }
-        .page-header { padding:14px 16px 8px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
-        .page-title { font-size:19px; font-weight:700; color:var(--text); }
-        .points-display { background:linear-gradient(135deg,#FFE066,#FFD43B); border-radius:20px; padding:6px 14px; font-weight:700; font-size:13px; color:#5C3D00; cursor:pointer; }
-        .page-body { flex:1; overflow-y:auto; padding:6px 14px 20px; scroll-behavior:smooth; }
-        .card { background:var(--card); border-radius:var(--radius); padding:16px; margin-bottom:12px; box-shadow:var(--shadow); border:1.5px solid #F0E6DE; }
-        .card-header { font-weight:700; font-size:15px; color:var(--text); margin-bottom:10px; }
-        .btn { display:inline-flex; align-items:center; gap:5px; padding:10px 18px; border-radius:25px; border:none; font-weight:700; font-size:13px; cursor:pointer; transition:all 0.2s; }
-        .btn:active { transform:scale(0.94); filter:brightness(0.9); }
-        .btn-pink { background:var(--pink); color:#fff; }
-        .btn-blue { background:var(--blue); color:#fff; }
-        .btn-green { background:var(--green); color:#fff; }
-        .btn-orange { background:var(--orange); color:#fff; }
-        .btn-sm { padding:6px 14px; font-size:11px; border-radius:18px; }
-        .btn-xs { padding:4px 10px; font-size:10px; border-radius:14px; }
-        .btn-outline { background:#fff; border:2px solid #ddd; color:var(--text); }
-        .checklist-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:14px; margin-bottom:6px; background:#FFFAF6; border:1.5px solid #F5E8DC; cursor:pointer; }
-        .check-circle { width:28px; height:28px; border-radius:50%; border:2.5px solid #D5C4B3; display:flex; align-items:center; justify-content:center; font-size:14px; background:#fff; }
-        .check-circle.done { background:var(--green); border-color:var(--green); color:#fff; }
-        .checklist-label { flex:1; font-size:13px; font-weight:600; }
-        .checklist-label.done { text-decoration:line-through; color:#bbb; }
-        .checklist-del { font-size:16px; cursor:pointer; opacity:0.5; padding:4px; }
-        .game-area { min-height:280px; border-radius:var(--radius); background:#E8F8E0; display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:10px; padding:16px; position:relative; }
-        .game-card { width:70px; height:85px; border-radius:14px; background:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px; cursor:pointer; box-shadow:0 3px 10px rgba(0,0,0,0.1); border:3px solid transparent; flex-direction:column; }
-        .game-card.selected { border-color:#FF6B8A; transform:scale(1.06); }
-        .game-card.matched { animation:matchPop 0.5s ease forwards; pointer-events:none; }
-        @keyframes matchPop { 0%{opacity:1;transform:scale(1);} 50%{transform:scale(1.3);background:#FFE066;} 100%{transform:scale(0);opacity:0;} }
-        .goose { position:absolute; font-size:48px; cursor:pointer; filter:drop-shadow(0 4px 6px rgba(0,0,0,0.2)); animation:gooseWaddle 3s infinite alternate; }
-        @keyframes gooseWaddle { 0%{transform:translateX(0) rotate(-3deg);} 50%{transform:translateX(30px) rotate(3deg);} 100%{transform:translateX(-10px) rotate(-2deg);} }
-        .goose-word { position:absolute; background:#fff; border-radius:12px; padding:3px 8px; font-size:11px; font-weight:700; top:-18px; left:50%; transform:translateX(-50%); }
-        .reward-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:99; display:none; }
-        .reward-overlay.show { display:block; }
-        .reward-popup { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(0); background:#fff; border-radius:24px; padding:24px; z-index:100; text-align:center; transition:transform 0.3s; }
-        .reward-popup.show { transform:translate(-50%,-50%) scale(1); }
-        .tag { display:inline-block; padding:3px 10px; border-radius:12px; font-size:10px; font-weight:700; margin:2px; }
-        .tag-pink { background:#FFE8EE; color:#D63C5E; }
-        .tag-blue { background:#E3F0FA; color:#3B7DC4; }
-        .tag-green { background:#E6F9E8; color:#3A8A44; }
-        .tag-orange { background:#FFF3E5; color:#C7782A; }
-        .char-card { display:inline-flex; flex-direction:column; align-items:center; background:#FFF9F5; border-radius:12px; padding:8px 6px; min-width:50px; border:2px solid #F0E0D0; cursor:pointer; transition:all 0.2s; font-size:20px; font-weight:700; }
-        .char-card .pinyin { font-size:10px; color:var(--pink); }
-        .progress-bar { height:10px; border-radius:10px; background:#F0E6DE; overflow:hidden; margin:6px 0; }
-        .progress-fill { height:100%; border-radius:10px; background:linear-gradient(90deg,#FFD43B,#FFA94D); }
-        input[type="text"] { border:2px solid #E8D5C8; border-radius:20px; padding:8px 14px; font-size:13px; outline:none; width:100%; background:#FFFAF6; }
-        .hidden { display:none!important; }
+        body {
+            font-family: var(--font);
+            background: #E8EAED;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 440px;
+            height: 100vh;
+            max-height: 900px;
+            background: var(--bg);
+            display: flex;
+            border-radius: 0;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+        }
+        @media (max-width:440px) {
+            .app-container { max-height:100vh; border-radius:0; }
+        }
+
+        /* ---- 左侧导航 ---- */
+        .side-nav {
+            width: var(--nav-width);
+            min-width: var(--nav-width);
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0 12px;
+            gap: 6px;
+            border-right: 1px solid var(--border);
+            z-index: 10;
+            overflow-y: auto;
+        }
+        .nav-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--feishu-blue);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #fff;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        .nav-item {
+            width: 56px;
+            height: 56px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+            position: relative;
+            gap: 2px;
+        }
+        .nav-item .nav-icon { font-size: 20px; line-height: 1; }
+        .nav-item .nav-label { font-size: 10px; font-weight: 500; white-space: nowrap; }
+        .nav-item:hover { background: #F2F3F5; }
+        .nav-item:active { transform: scale(0.95); }
+        .nav-item.active {
+            background: var(--feishu-blue-light);
+            color: var(--feishu-blue);
+            font-weight: 600;
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 24px;
+            background: var(--feishu-blue);
+            border-radius: 0 3px 3px 0;
+        }
+
+        /* ---- 主区域 ---- */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .page-header {
+            padding: 16px 16px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .page-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .points-badge {
+            background: var(--feishu-blue-light);
+            color: var(--feishu-blue);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .page-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 16px 20px;
+            scroll-behavior: smooth;
+        }
+        .page-body::-webkit-scrollbar { width: 3px; }
+        .page-body::-webkit-scrollbar-thumb { background: #D0D3D9; border-radius: 10px; }
+
+        /* 卡片 */
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .card-header {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .stat-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .stat-item {
+            flex: 1;
+            background: #F7F8FA;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--feishu-blue);
+            line-height: 1.2;
+        }
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #F2F3F5;
+            color: var(--text);
+        }
+        .btn-primary {
+            background: var(--feishu-blue);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(51,112,255,0.3);
+        }
+        .btn-success { background: #00B578; color: #fff; }
+        .btn-warning { background: #FF8800; color: #fff; }
+        .btn-sm { padding: 5px 12px; font-size: 12px; border-radius: 6px; }
+        .btn-xs { padding: 3px 8px; font-size: 10px; border-radius: 5px; }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            background: #F7F8FA;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .checklist-item:hover { background: #EEF0F3; }
+        .check-circle {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            border: 2px solid #C9CDD4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: transparent;
+        }
+        .check-circle.done {
+            background: var(--feishu-blue);
+            border-color: var(--feishu-blue);
+            color: #fff;
+        }
+        .checklist-label { flex:1; font-size:13px; }
+        .checklist-label.done { text-decoration:line-through; color:#B0B6BE; }
+        .checklist-del { opacity:0.5; cursor:pointer; }
+
+        .game-area {
+            min-height: 240px;
+            border-radius: var(--radius);
+            background: #F0F5FF;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px;
+            position: relative;
+            border: 2px dashed #B8D1FF;
+        }
+        .game-card {
+            width: 60px; height: 70px;
+            border-radius: 10px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            border: 2px solid transparent;
+            flex-direction: column;
+            transition: 0.2s;
+        }
+        .game-card.selected { border-color: var(--feishu-blue); transform: scale(1.05); }
+        .game-card.matched { opacity:0; transform:scale(0); transition:0.3s; }
+
+        .goose {
+            position: absolute;
+            font-size: 44px;
+            cursor: pointer;
+            animation: waddle 3s infinite alternate;
+        }
+        @keyframes waddle { 0%{transform:translateX(0) rotate(-2deg);}100%{transform:translateX(20px) rotate(2deg);} }
+        .goose-word {
+            position: absolute;
+            background: #fff;
+            border-radius: 6px;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: 700;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            white-space: nowrap;
+        }
+
+        .overlay {
+            position: fixed; inset:0; background:rgba(0,0,0,0.4); z-index:99;
+            display: none; align-items:center; justify-content:center;
+        }
+        .overlay.show { display:flex; }
+        .popup {
+            background:#fff; border-radius:16px; padding:24px;
+            width:85%; max-width:320px; text-align:center;
+        }
+        .tag {
+            display:inline-block; padding:2px 8px; border-radius:10px;
+            font-size:10px; font-weight:600; margin:2px;
+        }
+        .tag-blue { background:#E1EAFF; color:#3370FF; }
+        .tag-green { background:#E4F7ED; color:#00B578; }
+        .tag-orange { background:#FFF3E5; color:#FF8800; }
+
+        .char-card {
+            display:inline-flex; flex-direction:column; align-items:center;
+            background:#F7F8FA; border-radius:8px; padding:6px;
+            min-width:48px; border:1px solid #E5E6EB; font-weight:600;
+        }
         .flex-wrap { display:flex; flex-wrap:wrap; gap:6px; }
     </style>
 </head>
 <body>
-    <div class="app-container" id="appContainer">
-        <nav class="side-nav" id="sideNav">
-            <div class="nav-logo">🌈</div>
-            <div class="nav-item active" data-page="home"><span class="nav-icon">🏠</span><span class="nav-label">首页</span></div>
-            <div class="nav-item" data-page="chinese"><span class="nav-icon">📖</span><span class="nav-label">语文</span></div>
-            <div class="nav-item" data-page="math"><span class="nav-icon">🔢</span><span class="nav-label">数学</span></div>
-            <div class="nav-item" data-page="english"><span class="nav-icon">🌍</span><span class="nav-label">英语</span></div>
-            <div class="nav-item" data-page="sport"><span class="nav-icon">🏃</span><span class="nav-label">运动</span></div>
-            <div class="nav-item" data-page="pinyinGame"><span class="nav-icon">🎯</span><span class="nav-label">拼音</span></div>
-            <div class="nav-item" data-page="gooseGame"><span class="nav-icon">🦆</span><span class="nav-label">抓大鹅</span></div>
-            <div class="nav-item" data-page="tasks"><span class="nav-icon">⚙️</span><span class="nav-label">任务</span></div>
-        </nav>
-        <main class="main-content" id="mainContent">
-            <div class="page-header" id="pageHeader">
-                <div class="page-title" id="pageTitle">🏠 今日打卡</div>
-                <div class="points-display" id="pointsDisplay" onclick="showRewards()">⭐ <span id="totalPoints">0</span> 积分</div>
-            </div>
-            <div class="page-body" id="pageBody"></div>
-        </main>
-    </div>
-    <div class="reward-overlay" id="rewardOverlay" onclick="closeRewards()"></div>
-    <div class="reward-popup" id="rewardPopup">
-        <h2>🎁 积分兑奖</h2>
-        <p>当前积分：<b id="rewardPoints">0</b> ⭐</p>
-        <div style="text-align:left;margin:12px 0;">
-            <div style="padding:8px;border-radius:12px;background:#FFF9F0;margin:4px 0;display:flex;justify-content:space-between;"><span>🍬 小零食</span><span class="tag tag-orange">10积分</span><button class="btn btn-sm btn-orange" onclick="redeemReward(10,'🍬小零食')">兑换</button></div>
-            <div style="padding:8px;border-radius:12px;background:#FFF9F0;margin:4px 0;display:flex;justify-content:space-between;"><span>🧸 小玩具</span><span class="tag tag-blue">20积分</span><button class="btn btn-sm btn-blue" onclick="redeemReward(20,'🧸小玩具')">兑换</button></div>
-            <div style="padding:8px;border-radius:12px;background:#FFF9F0;margin:4px 0;display:flex;justify-content:space-between;"><span>🎡 儿童乐园</span><span class="tag tag-pink">30积分</span><button class="btn btn-sm btn-pink" onclick="redeemReward(30,'🎡儿童乐园一次')">兑换</button></div>
+<div class="app-container">
+    <!-- 左侧导航 -->
+    <nav class="side-nav" id="sideNav">
+        <div class="nav-logo">📚</div>
+        <div class="nav-item active" data-page="home"><span class="nav-icon">🏠</span><span class="nav-label">首页</span></div>
+        <div class="nav-item" data-page="chinese"><span class="nav-icon">📖</span><span class="nav-label">语文</span></div>
+        <div class="nav-item" data-page="math"><span class="nav-icon">🔢</span><span class="nav-label">数学</span></div>
+        <div class="nav-item" data-page="english"><span class="nav-icon">🌍</span><span class="nav-label">英语</span></div>
+        <div class="nav-item" data-page="sport"><span class="nav-icon">🏃</span><span class="nav-label">运动</span></div>
+        <div class="nav-item" data-page="pinyinGame"><span class="nav-icon">🎯</span><span class="nav-label">拼音</span></div>
+        <div class="nav-item" data-page="gooseGame"><span class="nav-icon">🦆</span><span class="nav-label">单词</span></div>
+        <div class="nav-item" data-page="tasks"><span class="nav-icon">⚙️</span><span class="nav-label">管理</span></div>
+    </nav>
+
+    <main class="main-content">
+        <div class="page-header">
+            <div class="page-title" id="pageTitle">📊 今日概览</div>
+            <div class="points-badge" onclick="showRewards()">⭐ <span id="totalPoints">0</span> 积分</div>
         </div>
-        <button class="btn btn-outline btn-sm" onclick="closeRewards()">关闭</button>
+        <div class="page-body" id="pageBody"></div>
+    </main>
+</div>
+
+<div class="overlay" id="rewardOverlay" onclick="closeRewards()">
+    <div class="popup" id="rewardPopup" onclick="event.stopPropagation()">
+        <h3>🎁 积分兑换</h3>
+        <p style="color:#646A73;">当前积分：<b id="rewardPoints">0</b></p>
+        <div style="text-align:left;margin:16px 0;">
+            <div style="display:flex;justify-content:space-between;padding:8px;background:#F7F8FA;border-radius:8px;margin:4px 0;">🍬 小零食 <span>10分</span> <button class="btn btn-sm btn-warning" onclick="redeemReward(10,'🍬')">换</button></div>
+            <div style="display:flex;justify-content:space-between;padding:8px;background:#F7F8FA;border-radius:8px;margin:4px 0;">🧸 小玩具 <span>20分</span> <button class="btn btn-sm btn-primary" onclick="redeemReward(20,'🧸')">换</button></div>
+            <div style="display:flex;justify-content:space-between;padding:8px;background:#F7F8FA;border-radius:8px;margin:4px 0;">🎡 儿童乐园 <span>30分</span> <button class="btn btn-sm btn-success" onclick="redeemReward(30,'🎡')">换</button></div>
+        </div>
+        <button class="btn" onclick="closeRewards()">关闭</button>
     </div>
+</div>
 
-    <script>
-        // ===================== 数据与初始化 =====================
-        const STORAGE_KEY = 'preschool_workbench';
-        let appData = loadAppData();
+<script>
+// ---------- 数据层 ----------
+const STORAGE = 'feishu_kids';
+let app = load();
+const DEFAULT_CONTENT = {
+    poems:[{title:'静夜思',author:'李白',content:'床前明月光，疑是地上霜。\n举头望明月，低头思故乡。',explain:'月光照在床前...'}],
+    idiomStories:[{idiom:'守株待兔',story:'农夫等兔子...'}],
+    wordGroups:[['日','月','水','火','山']],
+    englishSentences:[['Hello!','你好！']],
+    dailyWords:[['apple','苹果']]
+};
+let CONTENT = JSON.parse(JSON.stringify(DEFAULT_CONTENT));
 
-        // 默认内置数据（content.json加载失败时的后备）
-        const DEFAULT_DATA = {
-            poems: [
-                {title:'静夜思',author:'李白',content:'床前明月光，疑是地上霜。\n举头望明月，低头思故乡。',explain:'月光照在床前，好像地上结了霜。抬头看月亮，低头想家乡。'},
-                {title:'春晓',author:'孟浩然',content:'春眠不觉晓，处处闻啼鸟。\n夜来风雨声，花落知多少。',explain:'春天睡到天亮，到处鸟儿叫。昨夜风雨过后，花儿落了多少。'},
-                {title:'悯农',author:'李绅',content:'锄禾日当午，汗滴禾下土。\n谁知盘中餐，粒粒皆辛苦。',explain:'农民在烈日下锄草，汗水滴在土里。每一粒饭都来之不易。'},
-                {title:'登鹳雀楼',author:'王之涣',content:'白日依山尽，黄河入海流。\n欲穷千里目，更上一层楼。',explain:'太阳靠着山落下，黄河向大海流去。想看更远就要站得更高。'},
-                {title:'咏鹅',author:'骆宾王',content:'鹅，鹅，鹅，曲项向天歌。\n白毛浮绿水，红掌拨清波。',explain:'大白鹅弯着脖子朝天叫，白羽毛浮在绿水，红脚掌拨水。'}
-            ],
-            idiomStories: [
-                {idiom:'守株待兔',story:'农夫看到兔子撞树死了，就每天守着树等兔子，结果再也没有兔子来。比喻不主动努力，想侥幸得到收获。'},
-                {idiom:'亡羊补牢',story:'羊圈破了羊丢了，主人赶紧修补羊圈。比喻出了问题及时补救，还不算晚。'},
-                {idiom:'画蛇添足',story:'几个人比赛画蛇，有人先画好又给蛇画脚，结果输了。比喻做了多余的事，反而不好。'}
-            ],
-            wordGroups: [
-                ['日','月','水','火','山','石','田','土','人','口'],
-                ['大','小','多','少','上','下','左','右','前','后'],
-                ['花','草','树','木','叶','果','根','芽','苗','林'],
-                ['红','黄','蓝','绿','白','黑','紫','粉','橙','灰']
-            ],
-            englishSentences: [
-                ['Good morning!','早上好！'],
-                ['How are you?','你好吗？'],
-                ['I am happy!','我很开心！'],
-                ['Let\'s play together.','我们一起玩吧。'],
-                ['Thank you very much!','非常感谢你！']
-            ],
-            dailyWords: [
-                ['apple','苹果','cat','猫','dog','狗','sun','太阳','milk','牛奶'],
-                ['book','书','pen','笔','fish','鱼','bird','鸟','tree','树'],
-                ['water','水','rice','米饭','egg','鸡蛋','red','红色','big','大的']
-            ]
-        };
+async function loadContent() {
+    try {
+        let res = await fetch('./content.json');
+        if(res.ok) {
+            let json = await res.json();
+            Object.assign(CONTENT, json);
+        }
+    } catch(e) {}
+}
 
-        let CONTENT = JSON.parse(JSON.stringify(DEFAULT_DATA)); // 实际使用的数据
+function load() {
+    let def = { points:0, today:'', checks:{}, customTasks:[], wrongs:[] };
+    try {
+        let raw = localStorage.getItem(STORAGE);
+        if(raw) {
+            let d = JSON.parse(raw);
+            let today = getToday();
+            if(d.today !== today) { d.today = today; d.checks = {}; }
+            return Object.assign(def, d);
+        }
+    } catch(e) {}
+    return def;
+}
+function save() { app.today = getToday(); localStorage.setItem(STORAGE, JSON.stringify(app)); }
+function getToday() { let d=new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
+function getDayIdx() { return Math.floor(Date.now()/864e5) % 30; }
 
-        // 加载外部content.json
-        async function loadContentJSON() {
-            try {
-                const res = await fetch('./content.json');
-                if (res.ok) {
-                    const json = await res.json();
-                    if (json.poems) CONTENT.poems = json.poems;
-                    if (json.idiomStories) CONTENT.idiomStories = json.idiomStories;
-                    if (json.wordGroups) CONTENT.wordGroups = json.wordGroups;
-                    if (json.englishSentences) CONTENT.englishSentences = json.englishSentences;
-                    if (json.dailyWords) CONTENT.dailyWords = json.dailyWords;
-                    console.log('✅ 已加载 content.json');
+const defaultTasks = [
+    {id:'chinese30',label:'📖 语文学习30分钟'},
+    {id:'poem',label:'🎤 背诵古诗'},
+    {id:'words',label:'✏️ 认识10个新字'},
+    {id:'math',label:'🔢 数学练习'},
+    {id:'english',label:'🌍 英语学习'},
+    {id:'sport',label:'🏃 运动1小时'},
+];
+function allTasks() { return [...defaultTasks, ...app.customTasks]; }
+
+// ---------- 导航 ----------
+let page = 'home';
+document.querySelectorAll('.nav-item').forEach(el => {
+    el.addEventListener('click', ()=> switchPage(el.dataset.page));
+});
+function switchPage(p) {
+    page = p;
+    document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
+    document.querySelector(`[data-page="${p}"]`).classList.add('active');
+    updatePoints();
+    render();
+}
+function updatePoints() {
+    document.getElementById('totalPoints').textContent = app.points;
+    document.getElementById('rewardPoints').textContent = app.points;
+}
+
+// ---------- 渲染 ----------
+const body = document.getElementById('pageBody');
+function render() {
+    body.innerHTML = '';
+    updatePoints();
+    switch(page) {
+        case 'home': renderHome(); break;
+        case 'chinese': renderChinese(); break;
+        case 'math': renderMath(); break;
+        case 'english': renderEnglish(); break;
+        case 'sport': renderSport(); break;
+        case 'pinyinGame': renderPinyin(); break;
+        case 'gooseGame': renderGoose(); break;
+        case 'tasks': renderTasks(); break;
+    }
+}
+
+function renderHome() {
+    let tasks = allTasks();
+    let doneCount = tasks.filter(t=>app.checks[t.id]).length;
+    let total = tasks.length;
+    let pct = total ? Math.round(doneCount/total*100) : 0;
+    let allDone = total && doneCount===total && !app.checks['_bonus'];
+    let html = `
+    <div class="stat-row">
+        <div class="stat-item"><div class="stat-value">${app.points}</div><div class="stat-label">总积分</div></div>
+        <div class="stat-item"><div class="stat-value">${doneCount}/${total}</div><div class="stat-label">今日任务</div></div>
+    </div>
+    <div class="card">
+        <div class="card-header">📋 今日打卡</div>
+        ${tasks.map(t=> {
+            let d = app.checks[t.id];
+            return `<div class="checklist-item" onclick="toggle('${t.id}')">
+                <div class="check-circle ${d?'done':''}">${d?'✓':''}</div>
+                <span class="checklist-label ${d?'done':''}">${t.label}</span>
+                ${app.customTasks.find(c=>c.id===t.id)?`<span class="checklist-del" onclick="event.stopPropagation();delTask('${t.id}')">🗑</span>`:''}
+            </div>`;
+        }).join('')}
+        ${allDone ? `<button class="btn btn-primary btn-sm" onclick="claimBonus()">🎁 领取1积分</button>` : ''}
+    </div>`;
+    body.innerHTML = html;
+}
+
+function renderChinese() {
+    let di = getDayIdx();
+    let poem = CONTENT.poems[di % CONTENT.poems.length];
+    let idiom = CONTENT.idiomStories[di % CONTENT.idiomStories.length];
+    let words = CONTENT.wordGroups[di % CONTENT.wordGroups.length];
+    body.innerHTML = `
+    <div class="card"><div class="card-header">📜 ${poem.title} - ${poem.author}</div>
+        <p style="white-space:pre-line;">${poem.content}</p>
+        <p style="color:#646A73;font-size:13px;">${poem.explain}</p>
+        <button class="btn btn-primary btn-sm" onclick="check('poem')">✅ 已背诵</button>
+    </div>
+    <div class="card"><div class="card-header">📚 ${idiom.idiom}</div><p>${idiom.story}</p></div>
+    <div class="card"><div class="card-header">✏️ 今日新字</div>
+        <div class="flex-wrap">${words.map(w=>`<div class="char-card"><span>${w}</span></div>`).join('')}</div>
+        <button class="btn btn-success btn-sm" style="margin-top:8px;" onclick="check('words')">✅ 已学习</button>
+    </div>`;
+}
+
+function renderMath() {
+    body.innerHTML = `<div class="card"><div class="card-header">🧮 计算练习</div>
+        <p>8 + 5 = ? (凑十：8+2=10,10+3=13)</p>
+        <p>14 - 6 = ? (破十：10-6=4,4+4=8)</p>
+        <button class="btn btn-primary btn-sm" onclick="check('math')">✅ 完成练习</button>
+    </div>`;
+}
+
+function renderEnglish() {
+    let di = getDayIdx();
+    let sents = CONTENT.englishSentences.slice((di*5)%CONTENT.englishSentences.length).slice(0,5);
+    let words = CONTENT.dailyWords[di % CONTENT.dailyWords.length];
+    body.innerHTML = `
+    <div class="card"><div class="card-header">💬 今日口语</div>
+        ${sents.map(s=>`<p><b>${s[0]}</b> (${s[1]})</p>`).join('')}
+        <button class="btn btn-primary btn-sm" onclick="check('english')">✅ 已打卡</button>
+    </div>
+    <div class="card"><div class="card-header">🔤 单词</div>
+        <div class="flex-wrap">${words.map((w,i)=>i%2===0?`<div class="char-card"><span>${w}</span><span style="font-size:10px;color:#646A73;">${words[i+1]||''}</span></div>`:'').join('')}</div>
+    </div>`;
+}
+
+function renderSport() {
+    body.innerHTML = `<div class="card"><div class="card-header">🏃 运动1小时</div>
+        <p>开合跳 · 青蛙蹲 · 伸展运动 · 跳舞 💃</p>
+        <button class="btn btn-primary btn-sm" onclick="check('sport')">✅ 完成运动</button>
+    </div>`;
+}
+
+// 拼音游戏 (保留核心)
+function renderPinyin() {
+    body.innerHTML = `<div class="card"><div class="card-header">🎯 拼音对对碰</div>
+        <div class="game-area" id="pyArea"></div>
+        <button class="btn btn-sm" onclick="renderPinyin()">🔄 重新开始</button>
+    </div>`;
+    // 简化版游戏逻辑
+    let pairs = [{py:'mā',w:'妈'},{py:'bà',w:'爸'},{py:'gē',w:'哥'}];
+    let cards = [];
+    pairs.forEach(p=>{ cards.push({t:'py',v:p.py,p:p.w}); cards.push({t:'w',v:p.w,p:p.w}); });
+    cards.sort(()=>Math.random()-0.5);
+    let sel = null;
+    let area = document.getElementById('pyArea');
+    cards.forEach((c,i)=>{
+        let div = document.createElement('div');
+        div.className = 'game-card';
+        div.textContent = c.v;
+        div.dataset.idx = i;
+        div.dataset.pair = c.p;
+        div.onclick = ()=>{
+            if(div.classList.contains('matched')) return;
+            if(!sel) { sel=div; div.classList.add('selected'); }
+            else if(sel===div) { sel=null; div.classList.remove('selected'); }
+            else {
+                if(sel.dataset.pair === div.dataset.pair) {
+                    sel.classList.add('matched'); div.classList.add('matched');
+                    sel=null;
+                } else {
+                    sel.classList.add('selected'); setTimeout(()=>{ sel.classList.remove('selected'); },300);
+                    sel=null;
                 }
-            } catch(e) { console.warn('使用内置默认数据',e); }
-        }
-
-        function loadAppData() {
-            const defaultData = { points:0, totalPointsEarned:0, todayDate:'', dailyChecks:{}, customTasks:[], wrongAnswers:[], gameScores:{pinyin:0,goose:0} };
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                if(raw) {
-                    const d = JSON.parse(raw);
-                    const today = getToday();
-                    if(d.todayDate !== today) { d.todayDate = today; d.dailyChecks = {}; }
-                    return {...defaultData, ...d};
-                }
-            }catch(e){}
-            return defaultData;
-        }
-        function saveData() { appData.todayDate = getToday(); localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); }
-        function getToday() { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
-        function getDayIndex() { return Math.floor(Date.now()/86400000) % 30; }
-
-        // ===================== 任务系统 =====================
-        const defaultTasks = [
-            {id:'chinese_30min',label:'📖 语文学习30分钟'},{id:'poem_recite',label:'🎤 背诵今日古诗'},
-            {id:'new_words',label:'✏️ 认识10个新字'},{id:'math_practice',label:'🔢 数学计算练习'},
-            {id:'english_daily',label:'🌍 每日英语学习'},{id:'sport_1hour',label:'🏃 运动锻炼1小时'},
-            {id:'reading',label:'📚 绘本阅读'}
-        ];
-        function getAllTasks() { return [...defaultTasks, ...appData.customTasks]; }
-
-        // ===================== 页面切换 =====================
-        let currentPage = 'home';
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', ()=>{ switchPage(item.dataset.page); });
-        });
-        function switchPage(page) {
-            currentPage = page;
-            document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-            document.querySelector(`[data-page="${page}"]`).classList.add('active');
-            updatePointsDisplay();
-            renderPage(page);
-        }
-        function updatePointsDisplay() {
-            document.getElementById('totalPoints').textContent = appData.points;
-            document.getElementById('rewardPoints').textContent = appData.points;
-        }
-
-        const body = document.getElementById('pageBody');
-        // ===================== 页面渲染（省略部分重复代码，此处提供核心渲染函数，其余页面类似） =====================
-        function renderPage(page) {
-            body.innerHTML = '';
-            updatePointsDisplay();
-            switch(page) {
-                case 'home': renderHome(); document.getElementById('pageTitle').innerHTML='🏠 今日打卡'; break;
-                case 'chinese': renderChinese(); document.getElementById('pageTitle').innerHTML='📖 语文天地'; break;
-                case 'math': renderMath(); document.getElementById('pageTitle').innerHTML='🔢 数学乐园'; break;
-                case 'english': renderEnglish(); document.getElementById('pageTitle').innerHTML='🌍 英语角'; break;
-                case 'sport': renderSport(); document.getElementById('pageTitle').innerHTML='🏃 运动时间'; break;
-                case 'pinyinGame': renderPinyinGame(); document.getElementById('pageTitle').innerHTML='🎯 拼音对对碰'; break;
-                case 'gooseGame': renderGooseGame(); document.getElementById('pageTitle').innerHTML='🦆 抓大鹅英语'; break;
-                case 'tasks': renderTaskManager(); document.getElementById('pageTitle').innerHTML='⚙️ 任务管理'; break;
             }
-        }
-
-        function renderHome() {
-            const allTasks = getAllTasks();
-            const totalDone = allTasks.filter(t=>appData.dailyChecks[t.id]).length;
-            const progress = allTasks.length ? Math.round((totalDone/allTasks.length)*100) : 0;
-            const allDone = allTasks.length && totalDone === allTasks.length;
-            let html = `<div class="card text-center"><div style="font-size:40px;">${allDone?'🎉':'🌞'}</div><div style="font-weight:700;">${allDone?'太棒了！全部完成！':'加油完成今日任务吧！'}</div><div class="progress-bar"><div class="progress-fill" style="width:${progress}%;"></div></div>${allDone && !appData.dailyChecks['_bonus_awarded'] ? `<button class="btn btn-pink btn-sm" onclick="claimDailyBonus()">🎁 领取今日积分</button>` : ''}</div>`;
-            html += `<div class="card"><div class="card-header">📋 今日任务清单</div>`;
-            allTasks.forEach(task=>{
-                const done = appData.dailyChecks[task.id] || false;
-                html += `<div class="checklist-item" onclick="toggleTask('${task.id}')"><div class="check-circle ${done?'done':''}">${done?'✓':''}</div><span class="checklist-label ${done?'done':''}">${task.label}</span>${appData.customTasks.find(t=>t.id===task.id)?`<span class="checklist-del" onclick="event.stopPropagation();deleteCustomTask('${task.id}')">🗑️</span>`:''}</div>`;
-            });
-            html += `</div><div class="card"><div class="card-header">🏆 积分兑换</div><button class="btn btn-orange btn-sm" onclick="showRewards()">查看兑换</button></div>`;
-            body.innerHTML = html;
-        }
-
-        function renderChinese() {
-            const di = getDayIndex();
-            const poem = CONTENT.poems[di % CONTENT.poems.length];
-            const idiom = CONTENT.idiomStories[di % CONTENT.idiomStories.length];
-            const words = CONTENT.wordGroups[di % CONTENT.wordGroups.length];
-            let html = `<div class="card"><div class="card-header">📜 今日古诗</div><b>《${poem.title}》— ${poem.author}</b><div style="white-space:pre-line;margin:8px 0;">${poem.content}</div><div style="color:var(--light-text);">💬 ${poem.explain}</div><button class="btn btn-pink btn-sm" onclick="markTaskDone('poem_recite')">✅ 已背诵</button></div>`;
-            html += `<div class="card"><div class="card-header">📚 成语故事</div><b>${idiom.idiom}</b><div>${idiom.story}</div></div>`;
-            html += `<div class="card"><div class="card-header">✏️ 今日新字（10个）</div><div class="flex-wrap">`;
-            words.forEach((w,i)=>{ html += `<div class="char-card"><span>${w}</span><span class="pinyin">pinyin</span></div>`; });
-            html += `</div><button class="btn btn-green btn-sm" onclick="markTaskDone('new_words')">✅ 已学习</button></div>`;
-            body.innerHTML = html;
-        }
-
-        // ===================== 其余页面渲染（数学、英语、运动、游戏、任务管理）请从前面完整代码中复制，但所有数组引用改为CONTENT.xxx =====================
-        // 由于篇幅限制，这里我只放了核心函数骨架，你需要把之前完整答案中 renderMath, renderEnglish, renderSport, renderPinyinGame, renderGooseGame, renderTaskManager 复制过来，
-        // 并把里面用到 poems, idiomStories, wordGroups, englishSentences, dailyWords 的地方全部改成 CONTENT.xxx
-
-        // 示例：数学页面渲染（简略版）
-        function renderMath() {
-            let html = `<div class="card"><div class="card-header">🧮 凑十法练习</div><div>8 + 5 = ?  凑十：8+2=10, 10+3=13</div></div>`;
-            html += `<div class="card"><div class="card-header">📔 错题本</div>暂无错题</div>`;
-            body.innerHTML = html;
-        }
-
-        function renderEnglish() {
-            const di = getDayIndex();
-            const sents = CONTENT.englishSentences.slice((di*5)%CONTENT.englishSentences.length, ((di*5)%CONTENT.englishSentences.length)+5);
-            const words = CONTENT.dailyWords[di % CONTENT.dailyWords.length];
-            let html = `<div class="card"><div class="card-header">💬 今日英语短句</div>`;
-            sents.forEach(s=>{ html += `<div><b>${s[0]}</b> (${s[1]})</div>`; });
-            html += `</div><div class="card"><div class="card-header">🔤 日常单词</div><div class="flex-wrap">`;
-            for(let i=0;i<words.length;i+=2) html += `<div class="char-card"><span>${words[i]}</span><span>${words[i+1]}</span></div>`;
-            html += `</div>`;
-            body.innerHTML = html;
-        }
-
-        function renderSport() {
-            body.innerHTML = `<div class="card text-center"><div style="font-size:50px;">🏃‍♂️</div><b>每日运动1小时</b><button class="btn btn-orange btn-sm" onclick="markTaskDone('sport_1hour')">✅ 完成运动打卡</button></div>`;
-        }
-
-        // ===================== 全局函数 =====================
-        window.toggleTask = function(id) {
-            if(appData.dailyChecks[id]) delete appData.dailyChecks[id];
-            else appData.dailyChecks[id] = true;
-            saveData(); renderHome();
         };
-        window.markTaskDone = function(id) { appData.dailyChecks[id] = true; saveData(); renderHome(); };
-        window.claimDailyBonus = function() {
-            if(appData.dailyChecks['_bonus_awarded']) return;
-            appData.dailyChecks['_bonus_awarded'] = true;
-            appData.points += 1; saveData(); updatePointsDisplay(); renderHome();
-        };
-        window.deleteCustomTask = function(id) {
-            appData.customTasks = appData.customTasks.filter(t=>t.id!==id);
-            delete appData.dailyChecks[id]; saveData(); renderHome();
-        };
-        window.showRewards = function() { document.getElementById('rewardOverlay').classList.add('show'); document.getElementById('rewardPopup').classList.add('show'); };
-        window.closeRewards = function() { document.getElementById('rewardOverlay').classList.remove('show'); document.getElementById('rewardPopup').classList.remove('show'); };
-        window.redeemReward = function(cost, name) {
-            if(appData.points >= cost) { appData.points -= cost; saveData(); updatePointsDisplay(); closeRewards(); alert('兑换成功：'+name); }
-            else alert('积分不足');
-        };
+        area.appendChild(div);
+    });
+}
 
-        // 拼音游戏、抓大鹅游戏等复杂逻辑也请从之前完整代码中复制，并确保数组引用为CONTENT
+// 抓大鹅
+function renderGoose() {
+    body.innerHTML = `<div class="card"><div class="card-header">🦆 抓单词大鹅</div>
+        <div class="game-area" id="gooseArea" style="height:260px;position:relative;"></div>
+    </div>`;
+    let words = [{en:'apple',zh:'苹果'},{en:'cat',zh:'猫'},{en:'dog',zh:'狗'}];
+    let target = words[0];
+    let area = document.getElementById('gooseArea');
+    words.forEach((w,i)=>{
+        let g = document.createElement('div');
+        g.className = 'goose';
+        g.style.left = (10 + i*30)%70 + '%';
+        g.style.top = (20 + i*25)%60 + '%';
+        g.innerHTML = `<span class="goose-word">${w.en}</span>🦆`;
+        g.onclick = ()=>{
+            if(w.en === target.en) { g.remove(); alert('抓对了！'); }
+            else { alert('再试试～'); }
+        };
+        area.appendChild(g);
+    });
+}
 
-        // ===================== 启动 =====================
-        async function init() {
-            await loadContentJSON();
-            updatePointsDisplay();
-            switchPage('home');
-        }
-        init();
-    </script>
+function renderTasks() {
+    body.innerHTML = `
+    <div class="card"><div class="card-header">⚙️ 任务管理</div>
+        <input type="text" id="newTask" placeholder="新任务名称" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;">
+        <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="addTask()">+ 添加</button>
+    </div>
+    <div class="card">
+        ${allTasks().map(t=>`<p>${t.label} ${app.customTasks.find(c=>c.id===t.id)?'<button onclick="delTask(\''+t.id+'\')">删除</button>':''}</p>`).join('')}
+    </div>`;
+}
+
+// ---------- 操作函数 ----------
+window.toggle = function(id) {
+    app.checks[id] = !app.checks[id];
+    save(); render();
+};
+window.check = function(id) { app.checks[id]=true; save(); render(); };
+window.claimBonus = function() {
+    if(app.checks['_bonus']) return;
+    app.checks['_bonus'] = true;
+    app.points += 1;
+    save(); updatePoints(); render();
+};
+window.delTask = function(id) {
+    app.customTasks = app.customTasks.filter(t=>t.id!==id);
+    delete app.checks[id];
+    save(); render();
+};
+window.addTask = function() {
+    let input = document.getElementById('newTask');
+    let label = input.value.trim();
+    if(!label) return;
+    app.customTasks.push({id:'c_'+Date.now(), label:'⭐ '+label});
+    save(); input.value=''; render();
+};
+window.showRewards = ()=> document.getElementById('rewardOverlay').classList.add('show');
+window.closeRewards = ()=> document.getElementById('rewardOverlay').classList.remove('show');
+window.redeemReward = function(cost, name) {
+    if(app.points >= cost) { app.points -= cost; save(); updatePoints(); closeRewards(); alert('兑换成功！'); }
+    else alert('积分不足');
+};
+
+// 初始化
+(async function() {
+    await loadContent();
+    updatePoints();
+    render();
+})();
+</script>
 </body>
 </html>
