@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>快乐学习卡片</title>
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=ZCOOL+KuaiLe&display=swap">
+<style>
+/* ===== 全局重置与变量 ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+  --bg-grad-1: #E8F4FD;
+  --bg-grad-2: #FFF8E7;
+  --card-bg: #FFFFFF;
+  --shadow: 0 8px 32px rgba(0,0,0,0.08);
+  --radius: 28px;
+  --hanzi-color: #FF8C42;
+  --hanzi-light: #FFE8D6;
+  --poem-color: #52B788;
+  --poem-light: #D8F3DC;
+  --eng-color: #4D96FF;
+  --eng-light: #DBEAFE;
+  --text-dark: #2D3436;
+  --text-mid: #636E72;
+  --text-light: #B2BEC3;
+}
+html, body {
+  height: 100%;
+  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--text-dark);
+  background: linear-gradient(160deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 100%);
+  overflow: hidden;
+  user-select: none;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* ===== 装饰背景元素（SVG） ===== */
+.bg-decor {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+.bg-decor.cloud-1 { top: 6%; left: -3%; animation: float 6s ease-in-out infinite; }
+.bg-decor.cloud-2 { top: 12%; right: -2%; animation: float 8s ease-in-out infinite 1s; }
+.bg-decor.star-1 { top: 38%; left: 4%; animation: twinkle 3s ease-in-out infinite; }
+.bg-decor.star-2 { top: 58%; right: 6%; animation: twinkle 4s ease-in-out infinite 0.5s; }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+@keyframes twinkle { 0%,100% { opacity: 0.25; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.2); } }
+
+/* ===== 顶部标题区 ===== */
+.header {
+  position: relative;
+  z-index: 10;
+  padding: 18px 20px 0;
+  text-align: center;
+  flex-shrink: 0;
+}
+.header h1 {
+  font-family: 'ZCOOL KuaiLe', 'Noto Sans SC', cursive;
+  font-size: 26px;
+  color: var(--text-dark);
+  margin-bottom: 14px;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.header h1 .title-icon { width: 28px; height: 28px; flex-shrink: 0; }
+
+/* ===== 分类 Tab ===== */
+.tabs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding: 0 16px;
+  margin-bottom: 14px;
+}
+.tab-btn {
+  flex: 1;
+  max-width: 110px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 20px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: rgba(255,255,255,0.75);
+  color: var(--text-mid);
+  backdrop-filter: blur(10px);
+}
+.tab-btn.active.hanzi {
+  background: var(--hanzi-color); color: #fff; transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(255,140,66,0.4);
+}
+.tab-btn.active.poem {
+  background: var(--poem-color); color: #fff; transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(82,183,136,0.4);
+}
+.tab-btn.active.eng {
+  background: var(--eng-color); color: #fff; transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(77,150,255,0.4);
+}
+
+/* ===== 卡片容器 ===== */
+.card-area {
+  flex: 1;
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  overflow: hidden;
+}
+.card-track {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  perspective: 1000px;
+}
+.card {
+  position: absolute;
+  width: 100%;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 26px 22px;
+  display: flex;
+  flex-direction: column;
+  min-height: 380px;
+  max-height: calc(100vh - 260px);
+  overflow-y: auto;
+  backface-visibility: hidden;
+}
+.card::-webkit-scrollbar { width: 0; }
+
+/* 滑动动画 */
+.card.slide-out-left {
+  animation: slideOutLeft 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.card.slide-out-right {
+  animation: slideOutRight 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.card.slide-in-right {
+  animation: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.card.slide-in-left {
+  animation: slideInLeft 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes slideOutLeft {
+  to { transform: translateX(-120%) rotate(-5deg) scale(0.9); opacity: 0; }
+}
+@keyframes slideOutRight {
+  to { transform: translateX(120%) rotate(5deg) scale(0.9); opacity: 0; }
+}
+@keyframes slideInRight {
+  from { transform: translateX(120%) rotate(5deg) scale(0.9); opacity: 0; }
+  to { transform: translateX(0) rotate(0) scale(1); opacity: 1; }
+}
+@keyframes slideInLeft {
+  from { transform: translateX(-120%) rotate(-5deg) scale(0.9); opacity: 0; }
+  to { transform: translateX(0) rotate(0) scale(1); opacity: 1; }
+}
+
+/* 卡片顶部装饰条 */
+.card-top-bar {
+  width: 48px; height: 5px; border-radius: 3px; margin: 0 auto 16px;
+}
+.card.hanzi-card .card-top-bar { background: var(--hanzi-color); }
+.card.poem-card .card-top-bar { background: var(--poem-color); }
+.card.eng-card .card-top-bar { background: var(--eng-color); }
+
+/* ===== 汉字卡片 ===== */
+.hanzi-pinyin {
+  text-align: center; font-size: 22px; color: var(--hanzi-color);
+  font-weight: 700; margin-bottom: 8px; letter-spacing: 3px;
+}
+.tian-zi-ge {
+  position: relative; width: 170px; height: 170px; margin: 0 auto 14px;
+  border: 3px solid var(--hanzi-color); border-radius: 8px;
+  background:
+    linear-gradient(to right, transparent 49.5%, rgba(255,140,66,0.2) 49.5%, rgba(255,140,66,0.2) 50.5%, transparent 50.5%),
+    linear-gradient(to bottom, transparent 49.5%, rgba(255,140,66,0.2) 49.5%, rgba(255,140,66,0.2) 50.5%, transparent 50.5%),
+    #FFFDF7;
+}
+.hanzi-char {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 115px; font-weight: 900; color: var(--text-dark); line-height: 1;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+.hanzi-char.writing {
+  color: var(--hanzi-color);
+  clip-path: inset(0 100% 0 0);
+  animation: writeChar 1.8s ease-in-out forwards;
+}
+@keyframes writeChar {
+  0% { clip-path: inset(0 100% 0 0); }
+  25% { clip-path: inset(0 75% 0 0); }
+  50% { clip-path: inset(0 50% 0 0); }
+  75% { clip-path: inset(0 25% 0 0); }
+  100% { clip-path: inset(0 0 0 0); }
+}
+.hanzi-meaning {
+  text-align: center; font-size: 15px; color: var(--text-mid); margin-bottom: 12px; line-height: 1.5;
+}
+.hanzi-words {
+  display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 14px;
+}
+.word-tag {
+  padding: 6px 14px; background: var(--hanzi-light); color: var(--hanzi-color);
+  border-radius: 14px; font-size: 14px; font-weight: 600;
+}
+.stroke-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 12px; border: 2px dashed var(--hanzi-color);
+  border-radius: 16px; background: var(--hanzi-light); color: var(--hanzi-color);
+  font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+}
+.stroke-btn:active { transform: scale(0.97); background: #FFD4B8; }
+.stroke-btn svg { width: 18px; height: 18px; }
+
+/* ===== 古诗卡片 ===== */
+.poem-title {
+  text-align: center; font-family: 'ZCOOL KuaiLe', cursive;
+  font-size: 26px; color: var(--poem-color); margin-bottom: 4px;
+}
+.poem-author {
+  text-align: center; font-size: 14px; color: var(--text-mid); margin-bottom: 16px;
+}
+.poem-divider {
+  width: 60px; height: 2px; margin: 4px auto 14px;
+  background: linear-gradient(to right, transparent, var(--poem-color), transparent);
+}
+.poem-lines {
+  display: flex; flex-direction: column; gap: 12px; align-items: center;
+}
+.poem-line { text-align: center; }
+.poem-line-pinyin {
+  font-size: 13px; color: var(--poem-color); margin-bottom: 2px; letter-spacing: 1px; font-weight: 500;
+}
+.poem-line-text {
+  font-size: 21px; color: var(--text-dark); font-weight: 600; letter-spacing: 3px;
+}
+
+/* ===== 英语卡片 ===== */
+.eng-word {
+  text-align: center; font-size: 46px; font-weight: 900; color: var(--eng-color);
+  margin-bottom: 6px; letter-spacing: 1px; word-break: break-all;
+}
+.eng-phonetic {
+  text-align: center; font-size: 19px; color: var(--text-mid); margin-bottom: 14px; font-style: italic;
+}
+.play-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: fit-content; margin: 0 auto 18px; padding: 12px 28px;
+  border: none; border-radius: 24px; background: var(--eng-color); color: #fff;
+  font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer;
+  transition: all 0.2s; box-shadow: 0 4px 14px rgba(77,150,255,0.35);
+}
+.play-btn:active { transform: scale(0.95); }
+.play-btn.playing { animation: pulse 0.8s ease-in-out infinite; }
+.play-btn svg { width: 18px; height: 18px; }
+@keyframes pulse {
+  0%,100% { box-shadow: 0 4px 14px rgba(77,150,255,0.35); }
+  50% { box-shadow: 0 4px 24px rgba(77,150,255,0.6); }
+}
+.eng-meaning {
+  text-align: center; font-size: 22px; color: var(--text-dark); font-weight: 600; margin-bottom: 10px;
+}
+.eng-example {
+  text-align: center; font-size: 14px; color: var(--text-mid);
+  padding: 10px 16px; background: var(--eng-light); border-radius: 14px; line-height: 1.6;
+}
+.eng-example .cn { display: block; margin-top: 4px; color: var(--text-light); font-size: 13px; }
+
+/* ===== 底部控制区 ===== */
+.controls {
+  position: relative; z-index: 10; padding: 10px 20px 24px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px; flex-shrink: 0;
+}
+.nav-buttons { display: flex; gap: 20px; align-items: center; }
+.nav-btn {
+  width: 50px; height: 50px; border: none; border-radius: 50%; background: #fff;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: all 0.2s; color: var(--text-dark);
+}
+.nav-btn:active { transform: scale(0.9); }
+.nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.nav-btn svg { width: 20px; height: 20px; }
+.progress-text {
+  min-width: 50px; text-align: center; font-size: 15px; font-weight: 700; color: var(--text-mid);
+}
+.dots {
+  display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; max-width: 300px;
+}
+.dot {
+  width: 8px; height: 8px; border-radius: 50%; background: rgba(0,0,0,0.15);
+  transition: all 0.3s; cursor: pointer;
+}
+.dot.active { width: 22px; border-radius: 4px; }
+.dot.active.hanzi-dot { background: var(--hanzi-color); }
+.dot.active.poem-dot { background: var(--poem-color); }
+.dot.active.eng-dot { background: var(--eng-color); }
+
+/* ===== 响应式 ===== */
+@media (max-height: 680px) {
+  .header h1 { font-size: 22px; margin-bottom: 10px; }
+  .tabs { margin-bottom: 8px; }
+  .tab-btn { padding: 8px 12px; font-size: 14px; }
+  .card { padding: 18px; min-height: 300px; }
+  .tian-zi-ge { width: 130px; height: 130px; }
+  .hanzi-char { font-size: 88px; }
+  .eng-word { font-size: 36px; }
+  .poem-line-text { font-size: 17px; }
+  .controls { padding: 6px 20px 16px; gap: 8px; }
+}
+@media (max-width: 360px) {
+  .card { padding: 20px 16px; }
+  .tian-zi-ge { width: 145px; height: 145px; }
+  .hanzi-char { font-size: 98px; }
+}
+</style>
+</head>
+<body>
+
+<!-- SVG 图标定义 -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="icon-star" viewBox="0 0 24 24">
+      <path fill="#FFD93D" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+    </symbol>
+    <symbol id="icon-cloud" viewBox="0 0 64 40">
+      <path fill="#fff" stroke="#B8D4E8" stroke-width="2" d="M18 36a10 10 0 01-1-19.9A14 14 0 0144 18a8 8 0 010 18H18z"/>
+    </symbol>
+    <symbol id="icon-pencil" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 20h9M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+    </symbol>
+    <symbol id="icon-speaker" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+    </symbol>
+    <symbol id="icon-chevron-left" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M15 18l-6-6 6-6"/>
+    </symbol>
+    <symbol id="icon-chevron-right" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M9 18l6-6-6-6"/>
+    </symbol>
+    <symbol id="icon-book" viewBox="0 0 24 24">
+      <path fill="#FF8C42" d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- 背景装饰 -->
+<div class="bg-decor cloud-1"><svg width="70" height="44"><use href="#icon-cloud"/></svg></div>
+<div class="bg-decor cloud-2"><svg width="56" height="36"><use href="#icon-cloud"/></svg></div>
+<div class="bg-decor star-1"><svg width="28" height="28"><use href="#icon-star"/></svg></div>
+<div class="bg-decor star-2"><svg width="24" height="24"><use href="#icon-star"/></svg></div>
+
+<!-- 顶部 -->
+<header class="header">
+  <h1>
+    <svg class="title-icon"><use href="#icon-book"/></svg>
+    快乐学习卡片
+    <svg class="title-icon"><use href="#icon-book"/></svg>
+  </h1>
+  <nav class="tabs">
+    <button class="tab-btn active hanzi" data-tab="hanzi">汉字</button>
+    <button class="tab-btn poem" data-tab="poem">古诗</button>
+    <button class="tab-btn eng" data-tab="eng">英语</button>
+  </nav>
+</header>
+
+<!-- 卡片区 -->
+<main class="card-area">
+  <div class="card-track" id="cardTrack"></div>
+</main>
+
+<!-- 底部控制 -->
+<footer class="controls">
+  <div class="nav-buttons">
+    <button class="nav-btn" id="prevBtn" aria-label="上一张"><svg><use href="#icon-chevron-left"/></svg></button>
+    <span class="progress-text" id="progressText">1 / 1</span>
+    <button class="nav-btn" id="nextBtn" aria-label="下一张"><svg><use href="#icon-chevron-right"/></svg></button>
+  </div>
+  <div class="dots" id="dots"></div>
+</footer>
+
+<script>
+// ===== 数据：一年级汉字 =====
+const hanziData = [
+  { char: '一', pinyin: 'yī', meaning: '数字，最小的正整数', words: ['一个', '一天', '第一'] },
+  { char: '二', pinyin: 'èr', meaning: '数字，一加一的和', words: ['二月', '第二', '二十'] },
+  { char: '三', pinyin: 'sān', meaning: '数字，二加一的和', words: ['三个', '三月', '三角'] },
+  { char: '人', pinyin: 'rén', meaning: '能制造工具的高等动物', words: ['人们', '大人', '工人'] },
+  { char: '口', pinyin: 'kǒu', meaning: '嘴，容器通外面的地方', words: ['口水', '门口', '开口'] },
+  { char: '手', pinyin: 'shǒu', meaning: '人体上肢前端能拿东西的部分', words: ['手心', '小手', '手指'] },
+  { char: '日', pinyin: 'rì', meaning: '太阳，白天', words: ['日光', '今日', '生日'] },
+  { char: '月', pinyin: 'yuè', meaning: '月亮，计时单位', words: ['月亮', '月光', '一月'] },
+  { char: '水', pinyin: 'shuǐ', meaning: '无色无味的液体', words: ['水果', '喝水', '口水'] },
+  { char: '火', pinyin: 'huǒ', meaning: '物体燃烧时发出的光和焰', words: ['火车', '大火', '火山'] },
+  { char: '山', pinyin: 'shān', meaning: '地面形成的高耸部分', words: ['大山', '山水', '上山'] },
+  { char: '石', pinyin: 'shí', meaning: '构成地壳的矿物质硬块', words: ['石头', '石子', '宝石'] },
+  { char: '田', pinyin: 'tián', meaning: '种植农作物的土地', words: ['田地', '水田', '田野'] },
+  { char: '土', pinyin: 'tǔ', meaning: '地面上的泥沙混合物', words: ['土地', '泥土', '国土'] },
+  { char: '大', pinyin: 'dà', meaning: '在体积、面积上超过一般', words: ['大人', '大家', '大小'] },
+  { char: '小', pinyin: 'xiǎo', meaning: '在体积、面积上不及一般', words: ['小鸟', '小心', '大小'] },
+  { char: '上', pinyin: 'shàng', meaning: '位置在高处的', words: ['上面', '上学', '上山'] },
+  { char: '下', pinyin: 'xià', meaning: '位置在低处的', words: ['下面', '下雨', '上下'] },
+  { char: '木', pinyin: 'mù', meaning: '树类植物的通称', words: ['木头', '树木', '木马'] },
+  { char: '禾', pinyin: 'hé', meaning: '谷类植物的统称', words: ['禾苗', '禾田', '禾草'] }
+];
+
+// ===== 数据：一年级古诗 =====
+const poemData = [
+  {
+    title: '咏鹅', author: '骆宾王',
+    lines: [
+      { text: '鹅，鹅，鹅，', pinyin: 'é, é, é,' },
+      { text: '曲项向天歌。', pinyin: 'qū xiàng xiàng tiān gē.' },
+      { text: '白毛浮绿水，', pinyin: 'bái máo fú lǜ shuǐ,' },
+      { text: '红掌拨清波。', pinyin: 'hóng zhǎng bō qīng bō.' }
+    ]
+  },
+  {
+    title: '静夜思', author: '李白',
+    lines: [
+      { text: '床前明月光，', pinyin: 'chuáng qián míng yuè guāng,' },
+      { text: '疑是地上霜。', pinyin: 'yí shì dì shàng shuāng.' },
+      { text: '举头望明月，', pinyin: 'jǔ tóu wàng míng yuè,' },
+      { text: '低头思故乡。', pinyin: 'dī tóu sī gù xiāng.' }
+    ]
+  },
+  {
+    title: '春晓', author: '孟浩然',
+    lines: [
+      { text: '春眠不觉晓，', pinyin: 'chūn mián bù jué xiǎo,' },
+      { text: '处处闻啼鸟。', pinyin: 'chù chù wén tí niǎo.' },
+      { text: '夜来风雨声，', pinyin: 'yè lái fēng yǔ shēng,' },
+      { text: '花落知多少。', pinyin: 'huā luò zhī duō shǎo.' }
+    ]
+  },
+  {
+    title: '悯农', author: '李绅',
+    lines: [
+      { text: '锄禾日当午，', pinyin: 'chú hé rì dāng wǔ,' },
+      { text: '汗滴禾下土。', pinyin: 'hàn dī hé xià tǔ.' },
+      { text: '谁知盘中餐，', pinyin: 'shuí zhī pán zhōng cān,' },
+      { text: '粒粒皆辛苦。', pinyin: 'lì lì jiē xīn kǔ.' }
+    ]
+  },
+  {
+    title: '登鹳雀楼', author: '王之涣',
+    lines: [
+      { text: '白日依山尽，', pinyin: 'bái rì yī shān jìn,' },
+      { text: '黄河入海流。', pinyin: 'huáng hé rù hǎi liú.' },
+      { text: '欲穷千里目，', pinyin: 'yù qióng qiān lǐ mù,' },
+      { text: '更上一层楼。', pinyin: 'gèng shàng yī céng lóu.' }
+    ]
+  },
+  {
+    title: '画', author: '王维',
+    lines: [
+      { text: '远看山有色，', pinyin: 'yuǎn kàn shān yǒu sè,' },
+      { text: '近听水无声。', pinyin: 'jìn tīng shuǐ wú shēng.' },
+      { text: '春去花还在，', pinyin: 'chūn qù huā hái zài,' },
+      { text: '人来鸟不惊。', pinyin: 'rén lái niǎo bù jīng.' }
+    ]
+  }
+];
+
+// ===== 数据：一年级英语单词 =====
+const englishData = [
+  { word: 'apple', phonetic: '/ˈæpl/', meaning: '苹果', example: 'I like apples.', exampleCn: '我喜欢苹果。' },
+  { word: 'banana', phonetic: '/bəˈnɑːnə/', meaning: '香蕉', example: 'A banana is yellow.', exampleCn: '香蕉是黄色的。' },
+  { word: 'cat', phonetic: '/kæt/', meaning: '猫', example: 'The cat is cute.', exampleCn: '这只猫很可爱。' },
+  { word: 'dog', phonetic: '/dɒɡ/', meaning: '狗', example: 'I have a dog.', exampleCn: '我有一只狗。' },
+  { word: 'egg', phonetic: '/eɡ/', meaning: '鸡蛋', example: 'I eat an egg.', exampleCn: '我吃一个鸡蛋。' },
+  { word: 'fish', phonetic: '/fɪʃ/', meaning: '鱼', example: 'Fish can swim.', exampleCn: '鱼会游泳。' },
+  { word: 'girl', phonetic: '/ɡɜːl/', meaning: '女孩', example: 'She is a girl.', exampleCn: '她是一个女孩。' },
+  { word: 'boy', phonetic: '/bɔɪ/', meaning: '男孩', example: 'He is a boy.', exampleCn: '他是一个男孩。' },
+  { word: 'hello', phonetic: '/həˈləʊ/', meaning: '你好', example: 'Hello, everyone!', exampleCn: '大家好！' },
+  { word: 'goodbye', phonetic: '/ˌɡʊdˈbaɪ/', meaning: '再见', example: 'Goodbye, teacher!', exampleCn: '老师再见！' },
+  { word: 'one', phonetic: '/wʌn/', meaning: '一', example: 'I have one pen.', exampleCn: '我有一支笔。' },
+  { word: 'two', phonetic: '/tuː/', meaning: '二', example: 'Two and two is four.', exampleCn: '二加二等于四。' },
+  { word: 'three', phonetic: '/θriː/', meaning: '三', example: 'There are three cats.', exampleCn: '有三只猫。' },
+  { word: 'red', phonetic: '/red/', meaning: '红色', example: 'The apple is red.', exampleCn: '苹果是红色的。' },
+  { word: 'blue', phonetic: '/bluː/', meaning: '蓝色', example: 'The sky is blue.', exampleCn: '天空是蓝色的。' },
+  { word: 'green', phonetic: '/ɡriːn/', meaning: '绿色', example: 'Grass is green.', exampleCn: '草是绿色的。' },
+  { word: 'book', phonetic: '/bʊk/', meaning: '书', example: 'This is my book.', exampleCn: '这是我的书。' },
+  { word: 'pen', phonetic: '/pen/', meaning: '钢笔', example: 'I have a pen.', exampleCn: '我有一支钢笔。' },
+  { word: 'school', phonetic: '/skuːl/', meaning: '学校', example: 'I go to school.', exampleCn: '我去上学。' },
+  { word: 'water', phonetic: '/ˈwɔːtə/', meaning: '水', example: 'I drink water.', exampleCn: '我喝水。' }
+];
+
+// ===== 状态管理 =====
+const state = {
+  currentTab: 'hanzi',
+  currentIndex: 0,
+  isAnimating: false,
+  data: { hanzi: hanziData, poem: poemData, eng: englishData }
+};
+
+// ===== DOM 引用 =====
+const cardTrack = document.getElementById('cardTrack');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const progressText = document.getElementById('progressText');
+const dotsContainer = document.getElementById('dots');
+const tabBtns = document.querySelectorAll('.tab-btn');
+
+// ===== 卡片HTML生成 =====
+function createHanziCard(item) {
+  return `
+    <div class="card hanzi-card">
+      <div class="card-top-bar"></div>
+      <div class="hanzi-pinyin">${item.pinyin}</div>
+      <div class="tian-zi-ge">
+        <div class="hanzi-char" id="hanziChar">${item.char}</div>
+      </div>
+      <div class="hanzi-meaning">${item.meaning}</div>
+      <div class="hanzi-words">
+        ${item.words.map(w => `<span class="word-tag">${w}</span>`).join('')}
+      </div>
+      <button class="stroke-btn" onclick="playStroke(this)">
+        <svg><use href="#icon-pencil"/></svg> 看笔顺
+      </button>
+    </div>
+  `;
+}
+
+function createPoemCard(item) {
+  return `
+    <div class="card poem-card">
+      <div class="card-top-bar"></div>
+      <div class="poem-title">${item.title}</div>
+      <div class="poem-author">—— ${item.author}</div>
+      <div class="poem-divider"></div>
+      <div class="poem-lines">
+        ${item.lines.map(line => `
+          <div class="poem-line">
+            <div class="poem-line-pinyin">${line.pinyin}</div>
+            <div class="poem-line-text">${line.text}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function createEngCard(item) {
+  return `
+    <div class="card eng-card">
+      <div class="card-top-bar"></div>
+      <div class="eng-word">${item.word}</div>
+      <div class="eng-phonetic">${item.phonetic}</div>
+      <button class="play-btn" onclick="playWord(this, '${item.word}')">
+        <svg><use href="#icon-speaker"/></svg> 听发音
+      </button>
+      <div class="eng-meaning">${item.meaning}</div>
+      <div class="eng-example">
+        ${item.example}
+        <span class="cn">${item.exampleCn}</span>
+      </div>
+    </div>
+  `;
+}
+
+function getCardHTML(item) {
+  if (state.currentTab === 'hanzi') return createHanziCard(item);
+  if (state.currentTab === 'poem') return createPoemCard(item);
+  return createEngCard(item);
+}
+
+// ===== 渲染与切换 =====
+function renderInitial() {
+  const list = state.data[state.currentTab];
+  cardTrack.innerHTML = getCardHTML(list[0]);
+  updateControls();
+}
+
+function switchCard(newIndex, direction) {
+  if (state.isAnimating) return;
+  const list = state.data[state.currentTab];
+  if (newIndex < 0 || newIndex >= list.length || newIndex === state.currentIndex) return;
+
+  state.isAnimating = true;
+  const oldCard = cardTrack.querySelector('.card');
+  const outClass = direction === 'next' ? 'slide-out-left' : 'slide-out-right';
+  const inClass = direction === 'next' ? 'slide-in-right' : 'slide-in-left';
+
+  // 旧卡片滑出
+  if (oldCard) {
+    oldCard.classList.add(outClass);
+  }
+
+  // 创建新卡片
+  const newCardHTML = getCardHTML(list[newIndex]);
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = newCardHTML;
+  const newCard = tempDiv.firstElementChild;
+  newCard.classList.add(inClass);
+  cardTrack.appendChild(newCard);
+
+  state.currentIndex = newIndex;
+  updateControls();
+
+  // 动画结束后清理旧卡片
+  setTimeout(() => {
+    if (oldCard && oldCard.parentNode) oldCard.parentNode.removeChild(oldCard);
+    newCard.classList.remove(inClass);
+    state.isAnimating = false;
+  }, 420);
+}
+
+function nextCard() {
+  const list = state.data[state.currentTab];
+  if (state.currentIndex < list.length - 1) switchCard(state.currentIndex + 1, 'next');
+}
+
+function prevCard() {
+  if (state.currentIndex > 0) switchCard(state.currentIndex - 1, 'prev');
+}
+
+function goToCard(index) {
+  if (index === state.currentIndex) return;
+  switchCard(index, index > state.currentIndex ? 'next' : 'prev');
+}
+
+// ===== 控制更新 =====
+function updateControls() {
+  const list = state.data[state.currentTab];
+  progressText.textContent = `${state.currentIndex + 1} / ${list.length}`;
+  prevBtn.disabled = state.currentIndex === 0;
+  nextBtn.disabled = state.currentIndex === list.length - 1;
+
+  const colorClass = state.currentTab + '-dot';
+  dotsContainer.innerHTML = list.map((_, i) =>
+    `<div class="dot ${i === state.currentIndex ? 'active ' + colorClass : ''}" data-index="${i}"></div>`
+  ).join('');
+  dotsContainer.querySelectorAll('.dot').forEach(dot => {
+    dot.addEventListener('click', () => goToCard(parseInt(dot.dataset.index)));
+  });
+}
+
+// ===== 切换分类 =====
+function switchTab(tab) {
+  if (state.currentTab === tab || state.isAnimating) return;
+  state.currentTab = tab;
+  state.currentIndex = 0;
+
+  tabBtns.forEach(btn => {
+    btn.classList.remove('active', 'hanzi', 'poem', 'eng');
+    if (btn.dataset.tab === tab) btn.classList.add('active', tab);
+  });
+
+  // 直接替换（分类切换不做滑动动画）
+  cardTrack.innerHTML = getCardHTML(state.data[tab][0]);
+  updateControls();
+}
+
+// ===== 笔顺动画 =====
+function playStroke(btn) {
+  const charEl = document.getElementById('hanziChar');
+  if (!charEl) return;
+  charEl.classList.remove('writing');
+  void charEl.offsetWidth;
+  charEl.classList.add('writing');
+  btn.innerHTML = '<svg><use href="#icon-pencil"/></svg> 书写中...';
+  setTimeout(() => {
+    btn.innerHTML = '<svg><use href="#icon-pencil"/></svg> 再写一次';
+  }, 1900);
+}
+
+// ===== 英语发音 =====
+function playWord(btn, word) {
+  if (!('speechSynthesis' in window)) {
+    btn.innerHTML = '<svg><use href="#icon-speaker"/></svg> 设备不支持';
+    setTimeout(() => { btn.innerHTML = '<svg><use href="#icon-speaker"/></svg> 听发音'; }, 2000);
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(word);
+  utterance.lang = 'en-US';
+  utterance.rate = 0.8;
+  utterance.pitch = 1.1;
+
+  btn.classList.add('playing');
+  btn.innerHTML = '<svg><use href="#icon-speaker"/></svg> 播放中...';
+
+  utterance.onend = () => {
+    btn.classList.remove('playing');
+    btn.innerHTML = '<svg><use href="#icon-speaker"/></svg> 再听一次';
+  };
+  utterance.onerror = () => {
+    btn.classList.remove('playing');
+    btn.innerHTML = '<svg><use href="#icon-speaker"/></svg> 听发音';
+  };
+  window.speechSynthesis.speak(utterance);
+}
+
+// ===== 触摸滑动 =====
+let touchStartX = 0;
+const SWIPE_THRESHOLD = 50;
+
+cardTrack.addEventListener('touchstart', (e) => {
+  touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+
+cardTrack.addEventListener('touchend', (e) => {
+  const diff = touchStartX - e.changedTouches[0].screenX;
+  if (Math.abs(diff) > SWIPE_THRESHOLD) {
+    if (diff > 0) nextCard(); else prevCard();
+  }
+}, { passive: true });
+
+// 鼠标拖拽（桌面端）
+let mouseStartX = 0;
+let isDragging = false;
+cardTrack.addEventListener('mousedown', (e) => {
+  mouseStartX = e.screenX; isDragging = true;
+});
+cardTrack.addEventListener('mouseup', (e) => {
+  if (!isDragging) return; isDragging = false;
+  const diff = mouseStartX - e.screenX;
+  if (Math.abs(diff) > SWIPE_THRESHOLD) {
+    if (diff > 0) nextCard(); else prevCard();
+  }
+});
+
+// ===== 键盘支持 =====
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') prevCard();
+  if (e.key === 'ArrowRight') nextCard();
+});
+
+// ===== 事件绑定 =====
+prevBtn.addEventListener('click', prevCard);
+nextBtn.addEventListener('click', nextCard);
+tabBtns.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+
+// ===== 初始化 =====
+renderInitial();
+</script>
+</body>
+</html>
