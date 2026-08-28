@@ -302,17 +302,17 @@ body {
 .progress-text {
   min-width: 50px; text-align: center; font-size: 15px; font-weight: 700; color: var(--text-mid);
 }
-.dots {
-  display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; max-width: 300px;
+.progress-bar {
+  width: 100%; max-width: 280px; height: 8px; border-radius: 4px;
+  background: rgba(0,0,0,0.08); overflow: hidden; cursor: pointer;
 }
-.dot {
-  width: 8px; height: 8px; border-radius: 50%; background: rgba(0,0,0,0.15);
-  transition: all 0.3s; cursor: pointer;
+.progress-fill {
+  height: 100%; border-radius: 4px; transition: width 0.3s ease;
+  width: 0%;
 }
-.dot.active { width: 22px; border-radius: 4px; }
-.dot.active.hanzi-dot { background: var(--hanzi-color); }
-.dot.active.poem-dot { background: var(--poem-color); }
-.dot.active.eng-dot { background: var(--eng-color); }
+.progress-fill.hanzi-fill { background: var(--hanzi-color); }
+.progress-fill.poem-fill { background: var(--poem-color); }
+.progress-fill.eng-fill { background: var(--eng-color); }
 
 /* ===== 响应式 ===== */
 @media (max-height: 680px) {
@@ -394,7 +394,7 @@ body {
     <span class="progress-text" id="progressText">1 / 1</span>
     <button class="nav-btn" id="nextBtn" aria-label="下一张"><svg><use href="#icon-chevron-right"/></svg></button>
   </div>
-  <div class="dots" id="dots"></div>
+  <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
 </footer>
 
 <script>
@@ -1297,7 +1297,8 @@ const cardTrack = document.getElementById('cardTrack');
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 const progressText = document.getElementById('progressText');
-const dotsContainer = document.getElementById('dots');
+const progressBar = document.getElementById('progressBar');
+const progressFill = document.getElementById('progressFill');
 const tabBtns = document.querySelectorAll('.tab-btn');
 
 // ===== 卡片HTML生成 =====
@@ -1425,13 +1426,9 @@ function updateControls() {
   prevBtn.disabled = state.currentIndex === 0;
   nextBtn.disabled = state.currentIndex === list.length - 1;
 
-  const colorClass = state.currentTab + '-dot';
-  dotsContainer.innerHTML = list.map((_, i) =>
-    `<div class="dot ${i === state.currentIndex ? 'active ' + colorClass : ''}" data-index="${i}"></div>`
-  ).join('');
-  dotsContainer.querySelectorAll('.dot').forEach(dot => {
-    dot.addEventListener('click', () => goToCard(parseInt(dot.dataset.index)));
-  });
+  const percent = list.length > 1 ? (state.currentIndex / (list.length - 1)) * 100 : 0;
+  progressFill.style.width = percent + '%';
+  progressFill.className = 'progress-fill ' + state.currentTab + '-fill';
 }
 
 // ===== 切换分类 =====
@@ -1529,6 +1526,13 @@ document.addEventListener('keydown', (e) => {
 prevBtn.addEventListener('click', prevCard);
 nextBtn.addEventListener('click', nextCard);
 tabBtns.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+progressBar.addEventListener('click', (e) => {
+  const rect = progressBar.getBoundingClientRect();
+  const percent = (e.clientX - rect.left) / rect.width;
+  const list = state.data[state.currentTab];
+  const targetIndex = Math.round(percent * (list.length - 1));
+  goToCard(Math.max(0, Math.min(list.length - 1, targetIndex)));
+});
 
 // ===== 初始化 =====
 renderInitial();
