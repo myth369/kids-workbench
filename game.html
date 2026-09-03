@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>数学小达人 · __LEVEL_NAME__</title>
+<style>
+  :root{
+    --bg:#FFF8EF; --card:#FFFFFF; --ink:#3D3229; --ink-soft:#8B7A6B;
+    --coral:#FF7A59; --sun:#FFC94A; --grass:#3FBF7F; --line:#F0E4D6;
+    --shadow:0 8px 24px rgba(120,90,60,.12);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    margin:0;padding:0;min-height:100vh;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:linear-gradient(160deg,#FFF8EF 0%,#FFEFE0 50%,#FFE8F0 100%);
+    color:var(--ink);display:flex;align-items:center;justify-content:center;
+  }
+  #app{width:100%;max-width:560px;padding:16px}
+  .card{background:var(--card);border-radius:28px;box-shadow:var(--shadow);padding:22px 20px}
+
+  /* ---------- 顶部 ---------- */
+  .top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+  .badge{background:var(--sun);color:#7A5200;font-weight:800;font-size:14px;
+    padding:7px 14px;border-radius:999px;white-space:nowrap}
+  .stars{font-size:18px;letter-spacing:2px;line-height:1;min-width:60px}
+  .mute{background:#F6EFE7;border:none;border-radius:999px;width:36px;height:36px;font-size:17px;cursor:pointer}
+  .bar{height:12px;background:var(--line);border-radius:999px;overflow:hidden;margin-bottom:18px}
+  .bar>i{display:block;height:100%;width:0;border-radius:999px;
+    background:linear-gradient(90deg,var(--sun),var(--coral));transition:width .4s ease}
+
+  /* ---------- 十格阵 ---------- */
+  .frame{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;
+    background:#FFF3E6;border:3px solid #FFE0C2;border-radius:20px;padding:12px;margin-bottom:16px}
+  .cell{aspect-ratio:1/1;border-radius:14px;background:#FFFFFF;border:2px dashed #FFD9B8;
+    display:flex;align-items:center;justify-content:center;font-size:clamp(17px,5.6vw,28px);
+    color:transparent;position:relative;transition:transform .25s ease,background .25s ease}
+  .cell.a{background:#FFE3DA;border-style:solid;border-color:#FFB59B;color:#E85D33;animation:pop .3s ease}
+  .cell.b{background:#D8ECFF;border-style:solid;border-color:#9CCDFB;color:#2B7FD4;animation:pop .3s ease}
+  .cell.gone{background:#F5F5F5;border-style:solid;border-color:#E2E2E2;color:#BDBDBD}
+  .cell.gone::after,.cell.gone::before{content:"";position:absolute;left:16%;right:16%;height:3px;
+    background:#FF7A59;border-radius:2px}
+  .cell.gone::after{transform:rotate(-45deg)}
+  .cell.gone::before{transform:rotate(45deg)}
+  .cell.q{background:#FFF6DA;border-style:solid;border-color:#FFD86B;color:#C79A00;font-weight:900}
+  @keyframes pop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+
+  /* ---------- 算式 ---------- */
+  .expr{font-size:clamp(32px,9.5vw,44px);font-weight:900;text-align:center;letter-spacing:3px;
+    margin:6px 0 4px;font-variant-numeric:tabular-nums}
+  .expr .box{display:inline-block;min-width:1.25em;padding:0 .16em;border-bottom:5px solid var(--coral);
+    color:var(--coral)}
+  .speak{text-align:center;color:var(--ink-soft);font-size:15px;margin-bottom:16px}
+
+  /* ---------- 键盘 ---------- */
+  .pad{display:grid;grid-template-columns:repeat(6,1fr);gap:9px}
+  .key{aspect-ratio:1/1;border:none;border-radius:18px;background:#FFF1E2;color:var(--ink);
+    font-size:clamp(19px,5.4vw,25px);font-weight:800;cursor:pointer;
+    box-shadow:0 4px 0 #F0DCC6;transition:transform .08s,box-shadow .08s}
+  .key:active{transform:translateY(3px);box-shadow:0 1px 0 #F0DCC6}
+  .key.hint{background:#FFE9C7;box-shadow:0 4px 0 #EFD3A2;font-size:22px}
+
+  /* ---------- 反馈 ---------- */
+  .fb{min-height:66px;margin-top:16px;border-radius:18px;padding:12px 14px;font-size:16px;
+    line-height:1.55;display:none;font-weight:600}
+  .fb.ok{display:block;background:#E4F8EE;color:#1E7A50}
+  .fb.no{display:block;background:#FFF2DC;color:#9A6A00}
+  .fb .big{font-size:20px;font-weight:900;display:block;margin-bottom:4px}
+  .hintbtn{margin-top:9px;background:#FFD98A;border:none;border-radius:999px;padding:7px 16px;
+    font-size:14px;font-weight:800;color:#7A5200;cursor:pointer}
+  .hintbtn:disabled{opacity:.5;cursor:default}
+
+  /* ---------- 结算 ---------- */
+  .score h1{font-size:26px;margin:4px 0 6px;text-align:center}
+  .score .sub{text-align:center;color:var(--ink-soft);margin-bottom:18px}
+  .stat{display:flex;justify-content:space-around;text-align:center;margin-bottom:16px}
+  .stat div b{display:block;font-size:26px;color:var(--coral)}
+  .stat div span{font-size:13px;color:var(--ink-soft)}
+  .sticker{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:18px;min-height:34px}
+  .sticker i{font-style:normal;font-size:30px;animation:pop .4s ease backwards}
+  .wlist{background:#FFF6EE;border-radius:18px;padding:12px 14px;margin-bottom:16px;font-size:15px}
+  .wlist b{color:var(--coral)}
+  .wlist div{padding:3px 0}
+  .again{width:100%;background:var(--coral);color:#fff;border:none;border-radius:999px;padding:15px;
+    font-size:18px;font-weight:900;cursor:pointer;box-shadow:0 4px 0 #E05A3C;margin-bottom:10px}
+  .tip{text-align:center;font-size:13px;color:var(--ink-soft);line-height:1.6}
+  #reportCode{background:#F6EFE7;border-radius:14px;padding:10px;margin-top:10px;
+    white-space:pre-wrap;word-break:break-all;text-align:left;font-size:12px;
+    font-family:ui-monospace,Menlo,monospace}
+  .hide{display:none!important}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="card" id="play">
+    <div class="top">
+      <span class="badge" id="levelName">__LEVEL_NAME__</span>
+      <span class="stars" id="stars"></span>
+      <button class="mute" id="muteBtn" title="开关声音">🔊</button>
+    </div>
+    <div class="bar"><i id="barFill"></i></div>
+    <div class="frame" id="frame"></div>
+    <div class="expr" id="expr"></div>
+    <div class="speak" id="speak"></div>
+    <div class="pad" id="pad"></div>
+    <div class="fb" id="fb"></div>
+  </div>
+
+  <div class="card score hide" id="done">
+    <h1 id="doneTitle">🎉 完成啦！</h1>
+    <div class="sub" id="doneSub"></div>
+    <div class="sticker" id="sticker"></div>
+    <div class="stat">
+      <div><b id="sAcc">0%</b><span>正确率</span></div>
+      <div><b id="sTime">0:00</b><span>用时</span></div>
+      <div><b id="sFirst">0</b><span>一次做对</span></div>
+    </div>
+    <div class="wlist" id="wlist"></div>
+    <button class="again" id="againBtn">再玩一关 🔁</button>
+    <div class="tip">把下面这行发给爸爸/妈妈，就能记进你的学习档案 👇</div>
+    <div id="reportCode"></div>
+  </div>
+</div>
+
+<script>
+const PROBLEMS = __PROBLEMS_JSON__;
+const CHILD = "__CHILD_NAME__";
+const LEVEL = __LEVEL_NUM__;
+
+let idx = 0, stars = 0, wrong = [], firstTry = 0, attempts = 0;
+let hintLevel = 0, locked = false, t0 = Date.now(), sound = true;
+const $ = id => document.getElementById(id);
+
+/* ---------------- 音效（WebAudio，无外部依赖） ---------------- */
+let ac = null;
+function beep(freqs, dur, type){
+  if(!sound) return;
+  try{
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    freqs.forEach((f, i) => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = type; o.frequency.value = f;
+      const s = ac.currentTime + i * dur;
+      g.gain.setValueAtTime(.0001, s);
+      g.gain.exponentialRampToValueAtTime(.16, s + .02);
+      g.gain.exponentialRampToValueAtTime(.0001, s + dur);
+      o.connect(g); g.connect(ac.destination); o.start(s); o.stop(s + dur + .05);
+    });
+  }catch(e){}
+}
+const sndOk  = () => beep([660, 880, 1180], .13, "triangle");
+const sndNo  = () => beep([300, 220], .16, "sine");
+const sndEnd = () => beep([523, 659, 784, 1046], .16, "triangle");
+
+/* ---------------- 十格阵 / 长条阵 ---------------- */
+function drawCells(cells, cols){
+  const f = $("frame");
+  f.style.gridTemplateColumns = "repeat(" + cols + ",1fr)";
+  f.innerHTML = "";
+  cells.slice(0, cols).forEach((c, i) => {
+    const d = document.createElement("div");
+    d.className = "cell " + (c.cls || "");
+    d.textContent = c.txt || "";
+    d.style.animationDelay = (i * 25) + "ms";
+    f.appendChild(d);
+  });
+}
+function pad(cells, cols, cls){
+  while(cells.length < cols) cells.push({cls: cls || "", txt: ""});
+  return cells;
+}
+
+function renderFrame(p){
+  let cells = [], cols = 10;
+  if(p.kind === "add"){
+    for(let i = 0; i < p.a; i++) cells.push({cls:"a", txt:"●"});
+    for(let i = 0; i < p.b; i++) cells.push({cls:"b", txt:"●"});
+  } else if(p.kind === "sub"){
+    for(let i = 0; i < p.b; i++) cells.push({cls:"gone", txt:"●"});   // 被拿走的
+    for(let i = 0; i < p.a - p.b; i++) cells.push({cls:"a", txt:"●"}); // 剩下的
+  } else if(p.kind === "decompose"){
+    for(let i = 0; i < p.b; i++) cells.push({cls:"a", txt:"●"});
+    for(let i = 0; i < p.answer; i++) cells.push({cls:"q", txt:"?"});
+  } else if(p.kind === "fill" && p.op === "+"){
+    if(p.blank === "b"){                       // a + □ = a+b
+      for(let i = 0; i < p.a; i++) cells.push({cls:"a", txt:"●"});
+      for(let i = 0; i < p.b; i++) cells.push({cls:"q", txt:"?"});
+    } else {                                   // □ + b = a+b
+      for(let i = 0; i < p.a; i++) cells.push({cls:"q", txt:"?"});
+      for(let i = 0; i < p.b; i++) cells.push({cls:"b", txt:"●"});
+    }
+  } else if(p.kind === "fill" && p.op === "-"){
+    cols = 11;                                 // 减法填空用长条阵
+    if(p.blank === "a"){                       // □ - b = a-b ：拿走 b，剩 a-b
+      for(let i = 0; i < p.b; i++) cells.push({cls:"gone", txt:"●"});
+      for(let i = 0; i < p.a - p.b; i++) cells.push({cls:"a", txt:"●"});
+    } else {                                   // a - □ = a-b ：原有 a，剩 a-b，拿走 b
+      for(let i = 0; i < p.a - p.answer; i++) cells.push({cls:"a", txt:"●"});
+      for(let i = 0; i < p.answer; i++) cells.push({cls:"gone", txt:"●"});
+    }
+  }
+  drawCells(pad(cells, cols), cols);
+}
+
+/* ---------------- 题目 ---------------- */
+function showProblem(){
+  locked = false; attempts = 0; hintLevel = 0;
+  const p = PROBLEMS[idx];
+  renderFrame(p);
+  $("expr").innerHTML = p.expr.replace("□", '<span class="box">?</span>');
+  $("speak").textContent = p.speak + "？";
+  $("fb").className = "fb"; $("fb").innerHTML = "";
+  $("barFill").style.width = (idx / PROBLEMS.length * 100) + "%";
+  $("stars").textContent = "⭐".repeat(stars);
+}
+
+const PRAISE = ["太厉害了！","完全正确！","你真棒！","小脑袋转得真快！","就是这样！","答得又快又准！","好厉害呀！"];
+const randomPraise = () => PRAISE[Math.floor(Math.random() * PRAISE.length)];
+
+function showHint(){
+  const p = PROBLEMS[idx];
+  if(hintLevel >= 2) return;
+  hintLevel++;
+  $("fb").className = "fb no";
+  $("fb").innerHTML = '<span class="big">💡 小提示</span>' + p.hints[hintLevel];
+  if(hintLevel < 2){
+    const b = document.createElement("button");
+    b.className = "hintbtn"; b.textContent = "再来一点提示 💡";
+    b.onclick = showHint;
+    $("fb").appendChild(b);
+  }
+}
+
+function revealAnswer(){
+  const p = PROBLEMS[idx];
+  locked = true;
+  if(wrong.indexOf(p.expr) < 0) wrong.push(p.expr);
+  $("fb").className = "fb no";
+  $("fb").innerHTML = '<span class="big">💡 答案是 ' + p.answer + '</span>' +
+    p.hints[2] + '<div style="margin-top:6px;font-size:14px">记住它，下一题继续加油！</div>';
+  setTimeout(next, 2800);
+}
+
+function answer(v){
+  if(locked) return;
+  const p = PROBLEMS[idx];
+  attempts++;
+  if(v === p.answer){
+    locked = true;
+    if(attempts === 1) firstTry++;
+    stars++;
+    sndOk();
+    $("fb").className = "fb ok";
+    $("fb").innerHTML = '<span class="big">✅ 答对啦！</span>' + randomPraise() +
+      (attempts > 1 ? "（看了提示才做出来也没关系，多练几次就熟啦）" : "");
+    $("barFill").style.width = ((idx + 1) / PROBLEMS.length * 100) + "%";
+    $("stars").textContent = "⭐".repeat(stars);
+    setTimeout(next, 1100);
+  } else {
+    sndNo();
+    if(attempts === 1 && wrong.indexOf(p.expr) < 0) wrong.push(p.expr);
+    hintLevel = Math.min(hintLevel + 1, 2);
+    $("fb").className = "fb no";
+    $("fb").innerHTML = '<span class="big">🤔 再想想～</span>' + p.hints[hintLevel - 1];
+    if(hintLevel >= 2){
+      const b = document.createElement("button");
+      b.className = "hintbtn"; b.textContent = "看看答案 👀";
+      b.onclick = revealAnswer;
+      $("fb").appendChild(b);
+    } else {
+      const b = document.createElement("button");
+      b.className = "hintbtn"; b.textContent = "给我一点提示 💡";
+      b.onclick = showHint;
+      $("fb").appendChild(b);
+    }
+  }
+}
+
+function next(){
+  idx++;
+  if(idx >= PROBLEMS.length) return finish();
+  showProblem();
+}
+
+/* ---------------- 结算 ---------------- */
+function finish(){
+  sndEnd();
+  $("play").classList.add("hide");
+  $("done").classList.remove("hide");
+  const total = PROBLEMS.length;
+  const acc = Math.round(firstTry / total * 100);
+  const sec = Math.round((Date.now() - t0) / 1000);
+  const mm = Math.floor(sec / 60), ss = sec % 60;
+
+  $("doneTitle").textContent = acc >= 90 ? "🏆 太棒了，满分小达人！"
+    : (acc >= 60 ? "🎉 完成啦，继续加油！" : "🌱 完成啦，再练一次会更熟！");
+  $("doneSub").textContent = CHILD + " 闯关成功 · " + $("levelName").textContent;
+  $("sAcc").textContent = acc + "%";
+  $("sTime").textContent = mm + ":" + String(ss).padStart(2, "0");
+  $("sFirst").textContent = firstTry + "/" + total;
+
+  const n = Math.max(0, Math.min(5, Math.round(firstTry / total * 5)));
+  const st = $("sticker"); st.innerHTML = "";
+  ["🌟","🚀","🍎","🎈","🏅"].slice(0, n).forEach((e, i) => {
+    const s = document.createElement("i");
+    s.textContent = e; s.style.animationDelay = (i * 120) + "ms";
+    st.appendChild(s);
+  });
+  if(n === 0) st.innerHTML = '<span style="font-size:15px;color:#8B7A6B">这次没拿到贴纸，下次试试看！</span>';
+
+  const uniq = [...new Set(wrong)];
+  $("wlist").innerHTML = uniq.length
+    ? "<b>需要再练一练：</b>" + uniq.map(w => "<div>" + w + "</div>").join("")
+    : "<b>全部一次做对，超级棒！👏</b>";
+
+  const wrongIds  = PROBLEMS.filter(p => uniq.indexOf(p.expr) >= 0).map(p => p.id).join(",");
+  const rightIds  = PROBLEMS.filter(p => uniq.indexOf(p.expr) <  0).map(p => p.id).join(",");
+  $("reportCode").textContent =
+    'progress.py record --level ' + LEVEL + ' --total ' + total +
+    ' --correct ' + firstTry + ' --wrong "' + wrongIds + '"' +
+    ' --correct-ids "' + rightIds + '" --minutes ' + Math.max(1, mm);
+}
+
+/* ---------------- 键盘 ---------------- */
+function buildPad(){
+  const pad = $("pad");
+  for(let i = 0; i <= 10; i++){
+    const b = document.createElement("button");
+    b.className = "key"; b.textContent = i;
+    b.onclick = () => answer(i);
+    pad.appendChild(b);
+  }
+  const h = document.createElement("button");
+  h.className = "key hint"; h.textContent = "💡"; h.title = "提示";
+  h.onclick = showHint;
+  pad.appendChild(h);
+}
+document.addEventListener("keydown", e => {
+  if(locked) return;
+  if(e.key >= "0" && e.key <= "9") answer(Number(e.key));
+});
+$("muteBtn").onclick = () => { sound = !sound; $("muteBtn").textContent = sound ? "🔊" : "🔇"; };
+$("againBtn").onclick = () => location.reload();
+
+buildPad();
+showProblem();
+</script>
+</body>
+</html>
